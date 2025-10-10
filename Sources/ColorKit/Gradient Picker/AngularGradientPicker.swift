@@ -9,7 +9,6 @@
 import SwiftUI
 import CGExtender
 
-
 // MARK: Stop
 /// # Angular Gradient Stop
 ///
@@ -93,7 +92,6 @@ public struct AngularStop: View {
         }
     }
 }
-
 
 // MARK:  Picker
 
@@ -296,7 +294,6 @@ public struct AngularGradientPicker: View {
                 self.stops(proxy)
                 
             }.coordinateSpace(name: self.space)
-            
         }
     }
 }
