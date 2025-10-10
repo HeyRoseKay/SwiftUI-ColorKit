@@ -28,7 +28,6 @@ public struct ColorPickerButton: ButtonStyle {
     }
 }
 
-
 @available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
 public struct ColorPicker: View {
     @ObservedObject public var manager: ColorManager
@@ -133,7 +132,7 @@ public struct ColorPicker: View {
     }
     
     public var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             RoundedRectangle(cornerRadius: 5)
                 .fill(self.selectedColor.wrappedValue.color)
             pallette
