@@ -17,16 +17,20 @@ public struct GrayScaleSliderStyle: LSliderStyle {
     private var gradient: Gradient { Gradient(colors: [Color(white: 0), Color(white: 1)]) }
     
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
-        let strokeColor = Color(white: color.white < 0.6 ? 1 : 1-color.white)
+        let strokeColor = Color(white: color.white < 0.75 ? 1 : 1-color.white)
         return ZStack {
             Pentagon()
-            .fill(color.color)
-            Pentagon()
-                .stroke(strokeColor, style: .init(lineWidth: 3, lineJoin: .round))
+                .fill(color.color)
+            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                Pentagon()
+                    .stroke(Material.regular, style: .init(lineWidth: 3, lineJoin: .round))
+            } else {
+                Pentagon()
+                    .stroke(strokeColor, style: .init(lineWidth: 3, lineJoin: .round))
+            }
         }
         .frame(width: sliderHeight/2, height: 0.66*sliderHeight)
         .offset(x: 0, y: 0.16*sliderHeight-1.5)
-            
     }
     
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
@@ -34,11 +38,17 @@ public struct GrayScaleSliderStyle: LSliderStyle {
         return ZStack {
             RoundedRectangle(cornerRadius: 5)
                 .fill(fill)
-            RoundedRectangle(cornerRadius: 5)
-            .stroke(Color.gray)
+            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Material.thin)
+            } else {
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.gray)
+            }
         }
     }
 }
+
 @available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
 public struct GrayScaleSlider: View {
     @Binding public var color: ColorToken
