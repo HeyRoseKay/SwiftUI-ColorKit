@@ -49,12 +49,18 @@ public struct RGBSliderStyle: LSliderStyle {
         
         
         return ZStack {
-            Circle()
-                .fill(Color.white)
-                .shadow(radius: 2)
+            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                Circle()
+                    .fill(Material.thick)
+                    .shadow(radius: 2)
+            } else {
+                Circle()
+                    .fill(Color.white)
+                    .shadow(radius: 2)
+            }
             Circle()
                 .fill(currentColor)
-                .scaleEffect(0.8)
+                .scaleEffect(0.88)
         }.frame(width: sliderHeight, height: sliderHeight)
     }
 
@@ -64,13 +70,25 @@ public struct RGBSliderStyle: LSliderStyle {
         return AdaptiveLine(angle: configuration.angle)
             .stroke(gradient, style: style)
             .overlay(GeometryReader { proxy in
-                Capsule()
-                    .stroke(Color.white)
-                    .frame(width: proxy.size.width + self.sliderHeight)
-                    .rotationEffect(configuration.angle)
+                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                    Capsule()
+                        .stroke(Material.thin)
+                        .frame(width: proxy.size.width + self.sliderHeight)
+                        .offset(x: -self.sliderHeight / 2)
+                        .rotationEffect(configuration.angle)
+                        .shadow(radius: 4)
+                } else {
+                    Capsule()
+                        .stroke(Color.white)
+                        .frame(width: proxy.size.width + self.sliderHeight)
+                        .offset(x: -self.sliderHeight / 2)
+                        .rotationEffect(configuration.angle)
+                        .shadow(radius: 4)
+                }
             })
     }
 }
+
 @available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
 public struct RGBColorPicker: View {
     @Binding public var color: ColorToken
@@ -106,11 +124,10 @@ public struct RGBColorPicker: View {
        }
     
     public var body: some View {
-        VStack(spacing: 20){
+        VStack(spacing: 20) {
             makeSlider( .red)
             makeSlider(.green)
             makeSlider(.blue)
         }
     }
 }
-
