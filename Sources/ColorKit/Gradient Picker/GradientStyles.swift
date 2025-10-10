@@ -9,7 +9,6 @@
 import SwiftUI
 // MARK: - Configuration Structures
 
-
 /// Used to style the dragging view that represents a gradients start or end value
 @available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
 public struct GradientHandleConfiguration {
@@ -343,8 +342,6 @@ public struct AnyRadialGradientPickerStyle: RadialGradientPickerStyle {
     public func makeBar(configuration: RadialGradientBarConfiguration) -> some View {
         return self._makeBar(configuration)
     }
-    
-    
     
     public init<ST: RadialGradientPickerStyle>(_ style: ST) {
         self._makeGradient = style.makeGradientTypeErased
