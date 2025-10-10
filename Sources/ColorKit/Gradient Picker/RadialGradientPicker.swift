@@ -8,7 +8,6 @@
 
 import SwiftUI
 
-
 // MARK:  Stop
 
 /// # Radial Gradient Stop
@@ -70,17 +69,10 @@ public struct RadialStop: View {
                                     self.isActive = false
                                 }))
                     })
-                
-                
             }
         }
     }
 }
-
-
-
-
-
 
 // MARK:  Picker
 
@@ -250,4 +242,3 @@ public struct RadialGradientPicker: View {
         }
     }
 }
-
