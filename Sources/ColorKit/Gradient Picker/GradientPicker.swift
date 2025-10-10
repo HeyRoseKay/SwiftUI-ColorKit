@@ -8,9 +8,6 @@
 
 import SwiftUI
 
-
-
-
 // MARK: Gradient Manager
 @available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
 public class GradientManager: ObservableObject {
@@ -32,7 +29,6 @@ public struct GradientPicker: View {
     public init(_ manager: ObservedObject<GradientManager>) {
         self._manager = manager
     }
-    
     private var toolToggle: some View {
         Toggle(isOn: $manager.hideTools,
                label: {Text(!self.manager.hideTools ? "Hide Tools" : "Show Tools")})
@@ -80,5 +76,3 @@ public struct GradientPicker: View {
         }
     }
 }
-
-
