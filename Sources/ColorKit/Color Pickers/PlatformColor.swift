@@ -13,7 +13,6 @@ import AppKit
 public typealias PlatformColor = NSColor
 #endif
 
-
 extension PlatformColor {
     
     convenience init(cmyk: (c: CGFloat, m: CGFloat, y: CGFloat, k: CGFloat)) {
@@ -23,7 +22,7 @@ extension PlatformColor {
         let C = cmyTransform(cmyk.c)
         let M = cmyTransform(cmyk.m)
         let Y = cmyTransform(cmyk.y)
-        self.init(red: 1-C, green: 1-M, blue: 1-Y, alpha: 1)
         
+        self.init(red: 1-C, green: 1-M, blue: 1-Y, alpha: 1)
     }
 }
