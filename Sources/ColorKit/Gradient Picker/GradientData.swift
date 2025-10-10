@@ -5,9 +5,7 @@
 //  Created by Kieran Brown on 4/13/20.
 //
 
-
 import SwiftUI
-
 
 /// A Token representing the composite data from `LinearGradient`, `RadialGradient`, and `AngularGradient` parameters
 /// When finished designing the gradient just access the `swiftUIFile` value and copy/paste it into your project. 
@@ -66,7 +64,6 @@ public struct GradientData: Identifiable {
     /// depending on the systems requirements. Allows for easier modification of
     /// stop colors.
     public var stops: [Stop]
-    
     
     // Linear
     /// `LinearGradient` Start Location
@@ -127,7 +124,6 @@ public struct GradientData: Identifiable {
         self.name = name
         self.stops = stops
     }
-    
     
     public init(name: String, stops: [Stop], startPoint: UnitPoint, endPoint: UnitPoint) {
         self.name = name
