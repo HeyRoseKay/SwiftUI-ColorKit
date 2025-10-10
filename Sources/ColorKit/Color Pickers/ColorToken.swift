@@ -8,7 +8,6 @@
 
 import SwiftUI
 
-
 @available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
 public struct ColorToken: Identifiable {
     public enum ColorFormulation: String, CaseIterable, Identifiable {
@@ -405,7 +404,6 @@ public extension ColorToken {
         case triad
         case complementary = "complement"
     }
-    
     
     func colorScheme(_ type: ColorScheme) -> [ColorToken] {
         switch (type) {
