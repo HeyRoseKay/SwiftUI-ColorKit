@@ -9,8 +9,6 @@
 import SwiftUI
 import CGExtender
 
-
-
 // MARK: Stop
 
 /// # Linear Gradient Stop
@@ -76,11 +74,9 @@ public struct LinearStop: View {
                             self.isActive = false
                         }))
             }
-            
         }
     }
 }
-
 
 // MARK: Picker
 /// # Linear Gradient Picker
@@ -280,4 +276,3 @@ public struct LinearGradientPicker: View {
         }
     }
 }
-
