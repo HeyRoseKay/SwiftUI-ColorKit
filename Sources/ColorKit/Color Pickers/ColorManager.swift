@@ -25,7 +25,6 @@ public class ColorManager: ObservableObject {
         colors[new.id] = new
     }
     
-    
     public func delete() {
         if selected != nil {
             let temp = selected
@@ -34,8 +33,7 @@ public class ColorManager: ObservableObject {
         }
     }
     
-    public init(colors: [ColorToken]) {
-        
+    public init(colors: [ColorToken]) {   
         self.colors = [:]
         colors.forEach {
             self.colors[$0.id] = $0
