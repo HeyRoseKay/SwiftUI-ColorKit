@@ -62,6 +62,7 @@ public struct PalletteColorPicker: View {
             self.manager.selected = id
         }
     }
+    
     private var pallette: some View {
         ScrollView(.horizontal, showsIndicators: true) {
             HStack(spacing: 0) {
@@ -76,6 +77,7 @@ public struct PalletteColorPicker: View {
             }
         }
     }
+
     private var formulationPicker: some View {
         Picker(selection: self.selectedColor.colorFormulation, label: Text("Color Formulation")) {
             ForEach(ColorToken.ColorFormulation.allCases) { (formulation)  in
@@ -83,6 +85,7 @@ public struct PalletteColorPicker: View {
             }
         }.pickerStyle(SegmentedPickerStyle())
     }
+
     private var rgbColorSpacePicker: some View {
         Picker(selection: self.selectedColor.rgbColorSpace, label: Text("")) {
             ForEach(ColorToken.RGBColorSpace.allCases) { space in
@@ -90,30 +93,38 @@ public struct PalletteColorPicker: View {
             }
         }.pickerStyle(SegmentedPickerStyle())
     }
+
     private var rgbPicker: some View {
         VStack {
             rgbColorSpacePicker
             Spacer()
             RGBColorPicker(self.selectedColor)
-        }.padding(.vertical, 10)
+        }
     }
-    private var hsbPicker: some View {
-        HSBColorPicker(self.selectedColor)
-    }
+    
     private var currentColorPicker: some View {
         Group {
             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
-                rgbPicker
+                ZStack {
+                    rgbPicker
+                }.frame(height: 200)
             } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
-                hsbPicker
+                ZStack {
+                    HSBColorPicker(self.selectedColor)
+                }.frame(height: 300)
             } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
-                CMYKColorPicker(self.selectedColor)
+                ZStack {
+                    CMYKColorPicker(self.selectedColor)
+                }.frame(height: 220)
             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
-                GrayScaleSlider(self.selectedColor)
-                    .frame(height: 68)
+                ZStack {
+                    GrayScaleSlider(self.selectedColor)
+                        .frame(height: 68)
+                }.frame(height: 80)
             }
-        }.frame(height: 300)
+        }
     }
+
     private var buttons: some View {
         HStack {
             Button(action: self.manager.delete, label: {
