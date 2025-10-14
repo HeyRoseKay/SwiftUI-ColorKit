@@ -20,7 +20,7 @@ public struct GrayScaleSliderStyle: LSliderStyle {
         let strokeColor = Color(white: color.white < 0.75 ? 1 : 1-color.white)
         return ZStack {
             Pentagon()
-                .fill(color.color)
+                .fill(Color(white: color.white))
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Pentagon()
                     .stroke(Material.regular, style: .init(lineWidth: 2, lineJoin: .round))
