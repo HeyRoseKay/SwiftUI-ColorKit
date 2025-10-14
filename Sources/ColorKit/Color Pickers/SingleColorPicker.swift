@@ -74,35 +74,37 @@ public struct SingleColorPicker: View {
     }
 
     private var colorDescriptionOverlay: some View {
-        Group {
+        ZStack {
             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
+                let white: CGFloat = (color.red + color.green + color.blue) / 3
                 VStack {
                     Text("Red: \(String(format: "%.0f", color.red*255))")
                     Text("Green: \(String(format: "%.0f", color.green*255))")
                     Text("Blue: \(String(format: "%.0f", color.blue*255))")
                     Text(String(color.color.description))
-                }
+                }.foregroundColor(white > 0.5 ? Color.black : Color.white)
             } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
                 VStack {
                     Text("Hue: \(String(format: "%.0f", color.hue*360))")
                     Text("Saturation: \(String(format: "%.0f", color.saturation*100))%")
                     Text("Brightness: \(String(format: "%.0f", color.brightness*100))%")
                     Text(String(color.color.description))
-                }
+                }.foregroundColor(color.brightness > 0.5 ? Color.black : Color.white)
             } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
                 VStack {
                     Text("Cyan: \(String(format: "%.0f", color.cyan*100))%")
                     Text("Magenta: \(String(format: "%.0f", color.magenta*100))%")
                     Text("Yellow: \(String(format: "%.0f", color.yellow*100))%")
                     Text("Black: \(String(format: "%.0f", color.keyBlack*100))%")
-                }
+                    Text(String(color.color.description))
+                }.foregroundColor(color.keyBlack < 0.5 ? Color.black : Color.white)
             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
                 VStack {
                     Text("white: \(String(format: "%.0f", color.white*100))%")
-                    Text(String(color.color.description.dropLast(2)))
-                }
+                    Text(String(color.color.description))
+                }.foregroundColor(color.white > 0.5 ? Color.black : Color.white)
             }
-        }.foregroundColor(color.white > 0.5 ? Color.black : Color.white)
+        }
     }
 
     // MARK: - View Body
@@ -110,9 +112,7 @@ public struct SingleColorPicker: View {
         VStack(spacing: 20) {
             RoundedRectangle(cornerRadius: 10)
                 .fill(self.selectedColor.wrappedValue.color)
-                .overlay(GeometryReader { proxy in
-                    colorDescriptionOverlay
-                })
+                .overlay(colorDescriptionOverlay)
 
             Divider()
 
