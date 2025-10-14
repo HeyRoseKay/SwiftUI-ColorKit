@@ -45,16 +45,17 @@ public struct SingleColorPicker: View {
     private var rgbPicker: some View {
         VStack {
             rgbColorSpacePicker
+            Spacer()
             RGBColorPicker(self.selectedColor)
         }
     }
     
     private var currentColorPicker: some View {
-        Group {
+        ZStack {
             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
                 ZStack {
                     rgbPicker
-                }.frame(height: 200)
+                }.frame(height: 220)
             } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
                 ZStack {
                     HSBColorPicker(self.selectedColor)
@@ -69,7 +70,7 @@ public struct SingleColorPicker: View {
                         .frame(height: 68)
                 }.frame(height: 80)
             }
-        }
+        }.animation(.easeInOut, value: self.selectedColor.colorFormulation.wrappedValue)
     }
     
     // MARK: - View Body
@@ -77,7 +78,6 @@ public struct SingleColorPicker: View {
         VStack(spacing: 20) {
             RoundedRectangle(cornerRadius: 10)
                 .fill(self.selectedColor.wrappedValue.color)
-                .padding(.vertical)
 
             formulationPicker
             currentColorPicker

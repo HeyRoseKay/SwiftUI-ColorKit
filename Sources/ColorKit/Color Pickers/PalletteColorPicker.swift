@@ -103,11 +103,11 @@ public struct PalletteColorPicker: View {
     }
     
     private var currentColorPicker: some View {
-        Group {
+        ZStack {
             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
                 ZStack {
                     rgbPicker
-                }.frame(height: 200)
+                }.frame(height: 220)
             } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
                 ZStack {
                     HSBColorPicker(self.selectedColor)
@@ -122,7 +122,7 @@ public struct PalletteColorPicker: View {
                         .frame(height: 68)
                 }.frame(height: 80)
             }
-        }
+        }.animation(.easeInOut, value: self.selectedColor.colorFormulation.wrappedValue)
     }
 
     private var buttons: some View {
