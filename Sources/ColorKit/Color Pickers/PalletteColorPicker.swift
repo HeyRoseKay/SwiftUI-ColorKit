@@ -110,7 +110,7 @@ public struct ColorPicker: View {
                 CMYKColorPicker(self.selectedColor)
             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
                 GrayScaleSlider(self.selectedColor)
-                    .frame(height: 66)
+                    .frame(height: 68)
             }
         }.frame(height: 300)
     }

@@ -23,10 +23,10 @@ public struct GrayScaleSliderStyle: LSliderStyle {
                 .fill(color.color)
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Pentagon()
-                    .strokeBorder(Material.regular, style: .init(lineWidth: 3, lineJoin: .round))
+                    .stroke(Material.regular, style: .init(lineWidth: 2, lineJoin: .round))
             } else {
                 Pentagon()
-                    .strokeBorder(strokeColor, style: .init(lineWidth: 3, lineJoin: .round))
+                    .stroke(strokeColor, style: .init(lineWidth: 2, lineJoin: .round))
             }
         }
         .frame(width: sliderHeight/2, height: 0.66*sliderHeight)
@@ -39,7 +39,7 @@ public struct GrayScaleSliderStyle: LSliderStyle {
             RoundedRectangle(cornerRadius: 10)
                 .fill(fill)
             RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
         }
     }
 }

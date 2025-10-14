@@ -51,19 +51,20 @@ public struct CMYKSliderStyle: LSliderStyle {
             }
         }()
         
-        return ZStack {
-            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                Circle()
-                    .strokeBorder(Material.regular)
-                    .shadow(radius: 2)
-            } else {
-                Circle()
-                    .strokeBorder(Color.white)
-                    .shadow(radius: 2)
-            }
-            Circle()
-                .fill(currentColor)
-        }.frame(width: self.sliderHeight, height: self.sliderHeight)
+        return Circle()
+            .fill(currentColor)
+            .frame(width: self.sliderHeight, height: self.sliderHeight)
+            .overlay(GeometryReader { proxy in
+                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                    Circle()
+                        .stroke(Material.regular)
+                        .shadow(radius: 2)
+                } else {
+                    Circle()
+                        .stroke(Color.white)
+                        .shadow(radius: 2)
+                }
+            })
     }
     
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
@@ -72,7 +73,7 @@ public struct CMYKSliderStyle: LSliderStyle {
             .stroke(LinearGradient(gradient: Gradient(colors: colors), startPoint: .leading, endPoint: .trailing), style: style)
             .overlay(GeometryReader { proxy in
                 Capsule()
-                    .strokeBorder(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
                     .frame(width: proxy.size.width + self.sliderHeight)
                     .offset(x: -self.sliderHeight / 2)
                     .rotationEffect(configuration.angle)

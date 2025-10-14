@@ -19,17 +19,26 @@ public struct AlphaSliderStyle: LSliderStyle {
         ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .strokeBorder(Material.regular)
-                    .shadow(radius: 2)
+                    .fill(Material.regular)
             } else {
                 Circle()
-                    .strokeBorder(Color.white)
-                    .shadow(radius: 2)
+                    .fill(Color.white)
             }
             Circle()
                 .fill(color.color)
         }
-        .frame(width: sliderHeight, height: sliderHeight)
+            .frame(width: sliderHeight, height: sliderHeight)
+            .overlay(GeometryReader { proxy in
+                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                    Circle()
+                        .stroke(Material.regular)
+                        .shadow(radius: 2)
+                } else {
+                    Circle()
+                        .stroke(Color.white)
+                        .shadow(radius: 2)
+                }
+            })
     }
     public var blockHeight: CGFloat = 10
     
@@ -50,12 +59,11 @@ public struct AlphaSliderStyle: LSliderStyle {
             }
             .drawingGroup()
             .mask(Capsule().fill())
-            .frame(width: proxy.size.width + self.sliderHeight, height: self.sliderHeight)
             .overlay(
                 Capsule()
-                    .strokeBorder(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
                     .frame(width: proxy.size.width + self.sliderHeight)
-//                    .offset(x: -self.sliderHeight / 2)
+                    .offset(x: -self.sliderHeight / 2)
                     .shadow(radius: 2)
             )
         }
