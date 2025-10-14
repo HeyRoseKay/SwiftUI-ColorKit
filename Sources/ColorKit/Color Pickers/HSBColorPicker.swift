@@ -21,16 +21,15 @@ public struct HueSliderStyle: LSliderStyle {
         return ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .stroke(Material.regular)
+                    .strokeBorder(Material.regular)
                     .shadow(radius: 2)
             } else {
                 Circle()
-                    .stroke(Color.white)
+                    .strokeBorder(Color.white)
                     .shadow(radius: 2)
             }
             Circle()
                 .fill(Color(hue: configuration.pctFill, saturation: 1, brightness: 1))
-                .scaleEffect(0.88)
         }.frame(width: sliderHeight, height: sliderHeight)
     }
     
@@ -41,7 +40,7 @@ public struct HueSliderStyle: LSliderStyle {
             .stroke(gradient, style: style)
             .overlay(GeometryReader { proxy in
                 Capsule()
-                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .strokeBorder(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
                     .frame(width: proxy.size.width + self.sliderHeight)
                     .offset(x: -self.sliderHeight / 2)
                     .rotationEffect(configuration.angle)
@@ -63,14 +62,13 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
         ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .stroke(configuration.isActive ? Material.thin : .thick)
+                    .strokeBorder(configuration.isActive ? Material.thin : .thick)
             } else {
                 Circle()
-                    .stroke(configuration.isActive ? Color.white : .gray)
+                    .strokeBorder(configuration.isActive ? Color.white : .gray)
             }
             Circle()
-                .fill(Color(hue: self.hue, saturation: Double(configuration.pctX), brightness: Double(configuration.pctY)))
-                .scaleEffect(0.99)
+                .fill(Color(hue: self.hue, saturation: Double(configuration.pctX), brightness: Double(-configuration.pctY)))
         }.frame(width: 40, height: 40)
     }
 
@@ -80,24 +78,24 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
         let saturationGradient = LinearGradient(gradient:Gradient(colors: saturationColors), startPoint: .leading, endPoint: .trailing)
         if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
             return ZStack {
-                RoundedRectangle(cornerRadius: 5)
+                RoundedRectangle(cornerRadius: 10)
                     .fill(brightnessGradient)
 
-                RoundedRectangle(cornerRadius: 5)
+                RoundedRectangle(cornerRadius: 10)
                     .fill(saturationGradient)
                     .drawingGroup(opaque: false, colorMode: .extendedLinear)
                     .blendMode(.plusDarker)
-            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(Material.thin, lineWidth: 2))
+            }.overlay(RoundedRectangle(cornerRadius: 10).stroke(Material.thin, lineWidth: 2))
         } else {
             return ZStack {
-                RoundedRectangle(cornerRadius: 5)
+                RoundedRectangle(cornerRadius: 10)
                     .fill(brightnessGradient)
 
-                RoundedRectangle(cornerRadius: 5)
+                RoundedRectangle(cornerRadius: 10)
                     .fill(saturationGradient)
                     .drawingGroup(opaque: false, colorMode: .extendedLinear)
                     .blendMode(.plusDarker)
-            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.white, lineWidth: 2))
+            }.overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white, lineWidth: 2))
         }
     }
 }
@@ -128,7 +126,7 @@ public struct HSBColorPicker: View {
             LSlider(Binding(get: {self.color.hue}, set: {self.color = self.color.update(hue: $0)}))
                 .linearSliderStyle(HueSliderStyle(sliderHeight: sliderHeight))
                 .frame(height: sliderHeight)
-                .padding(.horizontal, sliderHeight/2)
+//                .padding(.horizontal, sliderHeight/2)
         }
     }
 }

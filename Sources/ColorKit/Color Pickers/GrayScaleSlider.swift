@@ -23,10 +23,10 @@ public struct GrayScaleSliderStyle: LSliderStyle {
                 .fill(color.color)
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Pentagon()
-                    .stroke(Material.regular, style: .init(lineWidth: 3, lineJoin: .round))
+                    .strokeBorder(Material.regular, style: .init(lineWidth: 3, lineJoin: .round))
             } else {
                 Pentagon()
-                    .stroke(strokeColor, style: .init(lineWidth: 3, lineJoin: .round))
+                    .strokeBorder(strokeColor, style: .init(lineWidth: 3, lineJoin: .round))
             }
         }
         .frame(width: sliderHeight/2, height: 0.66*sliderHeight)
@@ -36,10 +36,10 @@ public struct GrayScaleSliderStyle: LSliderStyle {
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
         let fill = LinearGradient(gradient: self.gradient, startPoint: .leading, endPoint: .trailing)
         return ZStack {
-            RoundedRectangle(cornerRadius: 5)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(fill)
-            RoundedRectangle(cornerRadius: 5)
-                .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
         }
     }
 }
@@ -64,7 +64,7 @@ public struct GrayScaleSlider: View {
             Text("\(Int(round(self.color.white * 100)))%")
                 .font(.subheadline)
                 .foregroundColor(.primary)
-                .padding(.bottom, 4)
+                .padding(.vertical, 4)
 
             LSlider(Binding(get: { self.color.white}, set: { self.color = self.color.update(white: $0) }))
                 .linearSliderStyle(GrayScaleSliderStyle(color: color, sliderHeight: sliderHeight))

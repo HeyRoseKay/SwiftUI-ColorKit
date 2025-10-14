@@ -69,7 +69,7 @@ public struct SingleColorPicker: View {
                 CMYKColorPicker(self.selectedColor)
             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
                 GrayScaleSlider(self.selectedColor)
-                    .frame(height: 40)
+                    .frame(height: 66)
             }
         }.frame(height: 300)
     }
@@ -77,7 +77,7 @@ public struct SingleColorPicker: View {
     // MARK: - View Body
     public var body: some View {
         VStack(spacing: 20) {
-            RoundedRectangle(cornerRadius: 5)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(self.selectedColor.wrappedValue.color)
             
             formulationPicker

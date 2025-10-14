@@ -19,16 +19,15 @@ public struct AlphaSliderStyle: LSliderStyle {
         ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .stroke(Material.regular)
+                    .strokeBorder(Material.regular)
                     .shadow(radius: 2)
             } else {
                 Circle()
-                    .stroke(Color.white)
+                    .strokeBorder(Color.white)
                     .shadow(radius: 2)
             }
             Circle()
                 .fill(color.color)
-                .scaleEffect(0.99)
         }
         .frame(width: sliderHeight, height: sliderHeight)
     }
@@ -51,11 +50,11 @@ public struct AlphaSliderStyle: LSliderStyle {
             }
             .drawingGroup()
             .mask(Capsule().fill())
-            .frame(width: proxy.size.width, height: self.sliderHeight)
+            .frame(width: proxy.size.width + self.sliderHeight, height: self.sliderHeight)
             .overlay(
                 Capsule()
-                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
-//                    .frame(width: proxy.size.width + self.sliderHeight)
+                    .strokeBorder(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .frame(width: proxy.size.width + self.sliderHeight)
 //                    .offset(x: -self.sliderHeight / 2)
                     .shadow(radius: 2)
             )
