@@ -120,7 +120,7 @@ public struct HSBColorPicker: View {
     
     public var body: some View {
         VStack(spacing: 20) {
-            TrackPad(value: Binding(get: {CGPoint(x: self.color.saturation, y: self.color.brightness)},
+            TrackPad(value: Binding(get: {CGPoint(x: self.color.saturation, y: 1 - self.color.brightness)},
                                     set: { (new) in
                                         self.color = self.color.update(saturation: Double(new.x))
                                         self.color = self.color.update(brightness: Double(1 - new.y))

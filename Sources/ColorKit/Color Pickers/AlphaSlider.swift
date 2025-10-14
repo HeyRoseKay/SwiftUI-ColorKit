@@ -17,13 +17,8 @@ public struct AlphaSliderStyle: LSliderStyle {
     
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
         ZStack {
-            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                Circle()
-                    .fill(Material.regular)
-            } else {
-                Circle()
-                    .fill(Color.white)
-            }
+            Circle()
+                .fill(Color.gray)
             Circle()
                 .fill(color.color)
         }
@@ -59,6 +54,7 @@ public struct AlphaSliderStyle: LSliderStyle {
             }
             .drawingGroup()
             .mask(Capsule().fill())
+            .offset(x: -self.sliderHeight / 2)
             .overlay(
                 Capsule()
                     .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
