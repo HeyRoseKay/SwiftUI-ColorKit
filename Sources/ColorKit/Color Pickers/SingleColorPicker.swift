@@ -10,37 +10,21 @@ import SwiftUI
 
 @available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
 public struct SingleColorPicker: View {
-    @ObservedObject public var manager: ColorManager
-    
+    @Binding public var color: ColorToken
+
     // MARK: - Initialization
-    public init(_ manager: ObservedObject<ColorManager>) {
-        self._manager = manager
-    }
-    
-    // MARK: - Computed Properties
-    private var color: ColorToken {
-        if let color = self.manager.colors.first {
-            self.manager.selected = color.key
-            return color.value
-        } else {
-            self.manager.add() // Should Add Default Color
-            self.manager.selected = self.manager.colors.first!.key
-            return self.manager.colors.first!.value
-        }
+    public init(_ color: Binding<ColorToken>) {
+        self._color = color
     }
 
     private var selectedColor: Binding<ColorToken> {
         Binding(get: {
             return self.color
         }) {
-            if self.manager.selected == nil {
-                self.manager.defaultColor = $0
-            } else {
-                self.manager.colors[self.manager.selected!]! = $0
-            }
+            self.color = $0
         }
     }
-    
+
     // MARK: - Picker Components
     private var formulationPicker: some View {
         Picker(selection: self.selectedColor.colorFormulation, label: Text("Color Formulation")) {
