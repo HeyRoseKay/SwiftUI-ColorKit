@@ -21,11 +21,11 @@ public struct HueSliderStyle: LSliderStyle {
         return ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .fill(Material.thick)
+                    .stroke(Material.regular)
                     .shadow(radius: 2)
             } else {
                 Circle()
-                    .fill(Color.white)
+                    .stroke(Color.white)
                     .shadow(radius: 2)
             }
             Circle()
@@ -40,21 +40,12 @@ public struct HueSliderStyle: LSliderStyle {
         return AdaptiveLine(angle: configuration.angle)
             .stroke(gradient, style: style)
             .overlay(GeometryReader { proxy in
-                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                    Capsule()
-                        .stroke(Material.thin)
-                        .frame(width: proxy.size.width + self.sliderHeight)
-                        .offset(x: -self.sliderHeight / 2)
-                        .rotationEffect(configuration.angle)
-                        .shadow(radius: 4)
-                } else {
-                    Capsule()
-                        .stroke(Color.white)
-                        .frame(width: proxy.size.width + self.sliderHeight)
-                        .offset(x: -self.sliderHeight / 2)
-                        .rotationEffect(configuration.angle)
-                        .shadow(radius: 4)
-                }
+                Capsule()
+                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .frame(width: proxy.size.width + self.sliderHeight)
+                    .offset(x: -self.sliderHeight / 2)
+                    .rotationEffect(configuration.angle)
+                    .shadow(radius: 4)
             })
     }
 }
@@ -72,20 +63,20 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
         ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .foregroundStyle(configuration.isActive ? Material.thin : .ultraThick)
+                    .stroke(configuration.isActive ? Material.thin : .thick)
             } else {
                 Circle()
-                    .foregroundColor(configuration.isActive ? .yellow : .white)
+                    .stroke(configuration.isActive ? Color.white : .gray)
             }
             Circle()
                 .fill(Color(hue: self.hue, saturation: Double(configuration.pctX), brightness: Double(configuration.pctY)))
-                .scaleEffect(0.88)
+                .scaleEffect(0.99)
         }.frame(width: 40, height: 40)
     }
 
     // FIXME: Come back and draw the 2D gradient with metal when I make a better pipeline
     public func makeTrack(configuration: TrackPadConfiguration) -> some View {
-        let brightnessGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 1, green: 1, blue: 1), Color(red: 0, green: 0, blue: 0)]), startPoint: .bottom, endPoint: .top)
+        let brightnessGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 1, green: 1, blue: 1), Color(red: 0, green: 0, blue: 0)]), startPoint: .top, endPoint: .bottom)
         let saturationGradient = LinearGradient(gradient:Gradient(colors: saturationColors), startPoint: .leading, endPoint: .trailing)
         if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
             return ZStack {
@@ -131,7 +122,6 @@ public struct HSBColorPicker: View {
                                     set: { (new) in
                                         self.color = self.color.update(saturation: Double(new.x))
                                         self.color = self.color.update(brightness: Double(new.y))
-                                        
             }), rangeX: 0.01...1, rangeY: 0.01...1)
                 .trackPadStyle(SaturationBrightnessStyle(hue: self.color.hue))
             

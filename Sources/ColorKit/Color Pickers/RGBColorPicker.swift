@@ -51,16 +51,16 @@ public struct RGBSliderStyle: LSliderStyle {
         return ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .fill(Material.thick)
+                    .stroke(Material.thick)
                     .shadow(radius: 2)
             } else {
                 Circle()
-                    .fill(Color.white)
+                    .stroke(Color.white)
                     .shadow(radius: 2)
             }
             Circle()
                 .fill(currentColor)
-                .scaleEffect(0.88)
+                .scaleEffect(0.99)
         }.frame(width: sliderHeight, height: sliderHeight)
     }
 
@@ -70,21 +70,12 @@ public struct RGBSliderStyle: LSliderStyle {
         return AdaptiveLine(angle: configuration.angle)
             .stroke(gradient, style: style)
             .overlay(GeometryReader { proxy in
-                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                    Capsule()
-                        .stroke(Material.thin)
-                        .frame(width: proxy.size.width + self.sliderHeight)
-                        .offset(x: -self.sliderHeight / 2)
-                        .rotationEffect(configuration.angle)
-                        .shadow(radius: 4)
-                } else {
-                    Capsule()
-                        .stroke(Color.white)
-                        .frame(width: proxy.size.width + self.sliderHeight)
-                        .offset(x: -self.sliderHeight / 2)
-                        .rotationEffect(configuration.angle)
-                        .shadow(radius: 4)
-                }
+                Capsule()
+                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .frame(width: proxy.size.width + self.sliderHeight)
+                    .offset(x: -self.sliderHeight / 2)
+                    .rotationEffect(configuration.angle)
+                    .shadow(radius: 4)
             })
     }
 }

@@ -19,16 +19,16 @@ public struct AlphaSliderStyle: LSliderStyle {
         ZStack {
             if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
                 Circle()
-                    .fill(Material.thick)
+                    .stroke(Material.regular)
                     .shadow(radius: 2)
             } else {
                 Circle()
-                    .fill(Color.white)
+                    .stroke(Color.white)
                     .shadow(radius: 2)
             }
             Circle()
                 .fill(color.color)
-                .scaleEffect(0.88)
+                .scaleEffect(0.99)
         }
         .frame(width: sliderHeight, height: sliderHeight)
     }
@@ -36,55 +36,29 @@ public struct AlphaSliderStyle: LSliderStyle {
     
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
         GeometryReader { proxy in
-            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                ZStack {
-                    VStack(spacing: 0) {
-                        ForEach(0..<max(Int(proxy.size.height / self.blockHeight), 2)) { (v: Int)  in
-                            HStack(spacing: 0) {
-                                ForEach(0..<max(Int((proxy.size.width + self.sliderHeight) / self.blockHeight), 2), id: \.self) { (h: Int) in
-                                    Rectangle()
-                                        .fill( h % 2 == 0 ? v % 2 == 0 ? Color.black : Color.white : v % 2 == 0 ? Color.white : Color.black).frame(width: self.blockHeight, height: self.blockHeight).tag(h)
-                                }
+            ZStack {
+                VStack(spacing: 0) {
+                    ForEach(0..<max(Int(proxy.size.height / self.blockHeight), 2)) { (v: Int)  in
+                        HStack(spacing: 0) {
+                            ForEach(0..<max(Int((proxy.size.width + self.sliderHeight) / self.blockHeight), 2), id: \.self) { (h: Int) in
+                                Rectangle()
+                                    .fill( h % 2 == 0 ? v % 2 == 0 ? Color.black : Color.white : v % 2 == 0 ? Color.white : Color.black).frame(width: self.blockHeight, height: self.blockHeight).tag(h)
                             }
                         }
                     }
-                    LinearGradient(gradient: self.gradient, startPoint: .leading, endPoint: .trailing)
                 }
-                .drawingGroup()
-                .mask(Capsule().fill())
-                .frame(width: proxy.size.width, height: self.sliderHeight)
-                .overlay(
-                    Capsule()
-                        .stroke(Material.thin, lineWidth: 1)
-                        .frame(width: proxy.size.width + self.sliderHeight)
-                        .offset(x: -self.sliderHeight / 2)
-                        .shadow(radius: 2)
-                )
-            } else {
-                ZStack {
-                    VStack(spacing: 0) {
-                        ForEach(0..<max(Int(proxy.size.height / self.blockHeight), 2)) { (v: Int)  in
-                            HStack(spacing: 0) {
-                                ForEach(0..<max(Int((proxy.size.width + self.sliderHeight) / self.blockHeight), 2), id: \.self) { (h: Int) in
-                                    Rectangle()
-                                        .fill( h % 2 == 0 ? v % 2 == 0 ? Color.black : Color.white : v % 2 == 0 ? Color.white : Color.black).frame(width: self.blockHeight, height: self.blockHeight).tag(h)
-                                }
-                            }
-                        }
-                    }
-                    LinearGradient(gradient: self.gradient, startPoint: .leading, endPoint: .trailing)
-                }
-                .drawingGroup()
-                .mask(Capsule().fill())
-                .frame(width: proxy.size.width, height: self.sliderHeight)
-                .overlay(
-                    Capsule()
-                        .stroke(Color.white, lineWidth: 1)
-                        .frame(width: proxy.size.width + self.sliderHeight)
-                        .offset(x: -self.sliderHeight / 2)
-                        .shadow(radius: 2)
-                )
+                LinearGradient(gradient: self.gradient, startPoint: .leading, endPoint: .trailing)
             }
+            .drawingGroup()
+            .mask(Capsule().fill())
+            .frame(width: proxy.size.width, height: self.sliderHeight)
+            .overlay(
+                Capsule()
+                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+//                    .frame(width: proxy.size.width + self.sliderHeight)
+//                    .offset(x: -self.sliderHeight / 2)
+                    .shadow(radius: 2)
+            )
         }
     }
 }

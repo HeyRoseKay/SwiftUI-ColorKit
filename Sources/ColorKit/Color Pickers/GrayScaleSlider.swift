@@ -38,13 +38,8 @@ public struct GrayScaleSliderStyle: LSliderStyle {
         return ZStack {
             RoundedRectangle(cornerRadius: 5)
                 .fill(fill)
-            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                RoundedRectangle(cornerRadius: 5)
-                    .stroke(Material.thin)
-            } else {
-                RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.gray)
-            }
+            RoundedRectangle(cornerRadius: 5)
+                .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
         }
     }
 }
@@ -56,15 +51,23 @@ public struct GrayScaleSlider: View {
     public init(_ color: Binding<ColorToken>) {
         self._color = color
     }
-    
+
     public init(_ color: Binding<ColorToken>, sliderHeight: CGFloat) {
         self._color = color
         self.sliderHeight = sliderHeight
     }
     
+    // MARK: - Body
     public var body: some View {
-        LSlider(Binding(get: { self.color.white},
-                               set: { self.color = self.color.update(white: $0) }))
-            .linearSliderStyle(GrayScaleSliderStyle(color: color, sliderHeight: sliderHeight))
+        VStack {
+            // MARK: - Percentage Display
+            Text("\(Int(round(self.color.white * 100)))%")
+                .font(.subheadline)
+                .foregroundColor(.primary)
+                .padding(.bottom, 4)
+
+            LSlider(Binding(get: { self.color.white}, set: { self.color = self.color.update(white: $0) }))
+                .linearSliderStyle(GrayScaleSliderStyle(color: color, sliderHeight: sliderHeight))
+        }
     }
 }

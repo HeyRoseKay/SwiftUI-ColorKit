@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+
 // MARK: - Configuration Structures
 
 /// Used to style the dragging view that represents a gradients start or end value

@@ -145,4 +145,3 @@ public struct ColorPicker: View {
         }.padding(.horizontal, 40)
     }
 }
-
