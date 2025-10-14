@@ -20,6 +20,7 @@ public struct SingleColorPicker: View {
     // MARK: - Computed Properties
     private var color: ColorToken {
         if let color = self.manager.colors.first {
+            self.manager.selected = color.key
             return color.value
         } else {
             self.manager.add() // Should Add Default Color
@@ -89,7 +90,8 @@ public struct SingleColorPicker: View {
         VStack(spacing: 20) {
             RoundedRectangle(cornerRadius: 10)
                 .fill(self.selectedColor.wrappedValue.color)
-            
+                .padding(.all)
+
             formulationPicker
             currentColorPicker
             
