@@ -96,12 +96,11 @@ public struct SingleColorPicker: View {
                     Text("Magenta: \(String(format: "%.0f", color.magenta*100))%")
                     Text("Yellow: \(String(format: "%.0f", color.yellow*100))%")
                     Text("Black: \(String(format: "%.0f", color.keyBlack*100))%")
-                    Text(String(color.color.description))
                 }.foregroundColor(color.keyBlack < 0.5 ? Color.black : Color.white)
             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
                 VStack {
                     Text("white: \(String(format: "%.0f", color.white*100))%")
-                    Text(String(color.color.description))
+                    Text(String(color.color.description.dropFirst(4)))
                 }.foregroundColor(color.white > 0.5 ? Color.black : Color.white)
             }
         }
