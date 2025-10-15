@@ -79,7 +79,7 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
     // FIXME: Come back and draw the 2D gradient with metal when I make a better pipeline
     public func makeTrack(configuration: TrackPadConfiguration) -> some View {
         let brightnessGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 1, green: 1, blue: 1), Color(red: 0, green: 0, blue: 0)]), startPoint: .top, endPoint: .bottom)
-        let saturationGradient = LinearGradient(gradient:Gradient(colors: saturationColors), startPoint: .leading, endPoint: .trailing)
+        let saturationGradient = LinearGradient(gradient: Gradient(colors: saturationColors), startPoint: .leading, endPoint: .trailing)
         if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
             return ZStack {
                 RoundedRectangle(cornerRadius: 10)
@@ -124,7 +124,7 @@ public struct HSBColorPicker: View {
                                     set: { (new) in
                                         self.color = self.color.update(saturation: Double(new.x))
                                         self.color = self.color.update(brightness: Double(1 - new.y))
-            }), rangeX: 0.01...1, rangeY: 0.01...1)
+            }), rangeX: 0.0...1, rangeY: 0.0...1)
                 .trackPadStyle(SaturationBrightnessStyle(hue: self.color.hue))
             
             LSlider(Binding(get: {self.color.hue}, set: {self.color = self.color.update(hue: $0)}))

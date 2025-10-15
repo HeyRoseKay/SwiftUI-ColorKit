@@ -49,28 +49,43 @@ public struct SingleColorPicker: View {
             RGBColorPicker(self.selectedColor)
         }
     }
-    
+
+    private var frameHeight: CGFloat {
+        switch self.selectedColor.wrappedValue.colorFormulation {
+        case .rgb:
+            220
+        case .hsb:
+            300
+        case .cmyk:
+            220
+        case .gray:
+            80
+        }
+    }
+
     private var currentColorPicker: some View {
         ZStack {
-            if self.selectedColor.colorFormulation.wrappedValue == .rgb {
-                ZStack {
-                    rgbPicker
-                }.frame(height: 220)
-            } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
-                ZStack {
-                    HSBColorPicker(self.selectedColor)
-                }.frame(height: 300)
-            } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
-                ZStack {
-                    CMYKColorPicker(self.selectedColor)
-                }.frame(height: 220)
-            } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
-                ZStack {
-                    GrayScaleSlider(self.selectedColor)
-                        .frame(height: 68)
-                }.frame(height: 80)
+            rgbPicker
+                .opacity(selectedColor.colorFormulation.wrappedValue == .rgb ? 1 : 0)
+                .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .rgb)
+
+            HSBColorPicker(self.selectedColor)
+                .opacity(selectedColor.colorFormulation.wrappedValue == .hsb ? 1 : 0)
+                .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .hsb)
+
+            CMYKColorPicker(self.selectedColor)
+                .opacity(selectedColor.colorFormulation.wrappedValue == .cmyk ? 1 : 0)
+                .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .cmyk)
+
+            ZStack {
+                GrayScaleSlider(self.selectedColor)
+                    .frame(height: 68)
             }
-        }.animation(.easeInOut, value: self.selectedColor.colorFormulation.wrappedValue)
+            .opacity(selectedColor.colorFormulation.wrappedValue == .gray ? 1 : 0)
+            .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .gray)
+        }
+        .animation(.easeInOut, value: selectedColor.colorFormulation.wrappedValue)
+        .frame(height: frameHeight)
     }
 
     private var colorDescriptionOverlay: some View {
@@ -117,7 +132,7 @@ public struct SingleColorPicker: View {
 
             formulationPicker
             currentColorPicker
-            
+
             AlphaSlider(self.selectedColor)
                 .frame(height: 40)
                 .padding(.bottom, 10)
@@ -125,3 +140,21 @@ public struct SingleColorPicker: View {
         .padding(.horizontal, 40)
     }
 }
+
+struct SingleColorPicker_Previews: PreviewProvider {
+
+    static var previews: some View {
+        ViewWithState()
+            .preferredColorScheme(.dark)
+    }
+
+    private struct ViewWithState : View {
+
+        @State var color: ColorToken = .init(colorSpace: .sRGB, r: 0, g: 0, b: 0)
+
+        var body: some View {
+            SingleColorPicker($color)
+        }
+    }
+}
+

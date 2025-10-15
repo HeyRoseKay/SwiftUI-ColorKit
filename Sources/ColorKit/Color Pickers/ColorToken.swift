@@ -400,9 +400,9 @@ public extension ColorToken {
     // MARK: - Color Scheme
     enum ColorScheme: String, CaseIterable {
         case analagous
-        case monochromatic = "mono"
-        case triad
-        case complementary = "complement"
+        case monochromatic
+        case triadic
+        case complementary
     }
     
     func colorScheme(_ type: ColorScheme) -> [ColorToken] {
@@ -411,9 +411,9 @@ public extension ColorToken {
             return analgousColors()
         case .monochromatic:
             return monochromaticColors()
-        case .triad:
+        case .triadic:
             return triadColors()
-        default:
+        case .complementary:
             return complementaryColors()
         }
     }

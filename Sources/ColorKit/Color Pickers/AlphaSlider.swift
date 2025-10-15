@@ -14,7 +14,9 @@ public struct AlphaSliderStyle: LSliderStyle {
     public var color: ColorToken
     public var sliderHeight: CGFloat = 40
     private var gradient: Gradient { Gradient(colors: [Color.white.opacity(0), Color.white]) }
-    
+
+    @Environment(\.colorScheme) var colorScheme
+
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
         ZStack {
             Circle()
@@ -24,15 +26,9 @@ public struct AlphaSliderStyle: LSliderStyle {
         }
             .frame(width: sliderHeight, height: sliderHeight)
             .overlay(GeometryReader { proxy in
-                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                    Circle()
-                        .stroke(Material.regular)
-                        .shadow(radius: 2)
-                } else {
-                    Circle()
-                        .stroke(Color.white)
-                        .shadow(radius: 2)
-                }
+                Circle()
+                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight)
+                    .shadow(radius: 2)
             })
     }
     public var blockHeight: CGFloat = 10
@@ -57,7 +53,7 @@ public struct AlphaSliderStyle: LSliderStyle {
             .offset(x: -self.sliderHeight / 2)
             .overlay(
                 Capsule()
-                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 1)
                     .frame(width: proxy.size.width + self.sliderHeight)
                     .offset(x: -self.sliderHeight / 2)
                     .shadow(radius: 2)
