@@ -10,11 +10,20 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct CMYKSliderStyle: LSliderStyle {
+    public enum ColorType: String, CaseIterable {
+        case cyan
+        case magenta
+        case yellow
+        case black
+    }
     public var sliderHeight: CGFloat
     public var type: ColorType
     public var color: ColorToken
+
+    @Environment(\.colorScheme) var colorScheme
+
     // Creates two colors based upon what the color would look like if the value of the slider was dragged all the way left or all the way right
     private var colors: [Color] {
         switch type {
@@ -30,13 +39,7 @@ public struct CMYKSliderStyle: LSliderStyle {
             
         }
     }
-    public enum ColorType: String, CaseIterable {
-        case cyan
-        case magenta
-        case yellow
-        case black
-    }
-    
+
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
         let currentColor: Color =  {
             switch type {
@@ -55,15 +58,9 @@ public struct CMYKSliderStyle: LSliderStyle {
             .fill(currentColor)
             .frame(width: self.sliderHeight, height: self.sliderHeight)
             .overlay(GeometryReader { proxy in
-                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                    Circle()
-                        .stroke(Material.regular)
-                        .shadow(radius: 2)
-                } else {
-                    Circle()
-                        .stroke(Color.white)
-                        .shadow(radius: 2)
-                }
+                Circle()
+                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, lineWidth: 2)
+                    .shadow(radius: 2)
             })
     }
     
@@ -73,7 +70,7 @@ public struct CMYKSliderStyle: LSliderStyle {
             .stroke(LinearGradient(gradient: Gradient(colors: colors), startPoint: .leading, endPoint: .trailing), style: style)
             .overlay(GeometryReader { proxy in
                 Capsule()
-                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 1)
                     .frame(width: proxy.size.width + self.sliderHeight)
                     .offset(x: -self.sliderHeight / 2)
                     .rotationEffect(configuration.angle)
@@ -82,7 +79,7 @@ public struct CMYKSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct CMYKColorPicker: View {
     @Binding public var color: ColorToken
     public var sliderHeights: CGFloat = 40
@@ -125,6 +122,25 @@ public struct CMYKColorPicker: View {
             makeSlider(.magenta)
             makeSlider(.yellow)
             makeSlider(.black)
+        }
+    }
+}
+
+struct CMYKColorPicker_Previews: PreviewProvider {
+
+    static var previews: some View {
+        ViewWithState()
+            .previewDisplayName("CMYK Picker")
+    }
+
+    private struct ViewWithState : View {
+
+        @State var color: ColorToken = .init(cyan: 0.42, magenta: 0.42, yellow: 0.42, keyBlack: 0.42)
+
+        var body: some View {
+            CMYKColorPicker($color)
+                .frame(height: 40)
+                .padding(.all, 40)
         }
     }
 }

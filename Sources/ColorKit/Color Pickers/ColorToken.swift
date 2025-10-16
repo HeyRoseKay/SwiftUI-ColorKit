@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct ColorToken: Identifiable {
     public enum ColorFormulation: String, CaseIterable, Identifiable {
         case rgb
@@ -394,7 +394,7 @@ public struct ColorToken: Identifiable {
     
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public extension ColorToken {
     
     // MARK: - Color Scheme

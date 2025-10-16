@@ -10,7 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct GrayScaleSliderStyle: LSliderStyle {
     public let color: ColorToken
     public let sliderHeight: CGFloat
@@ -21,7 +21,7 @@ public struct GrayScaleSliderStyle: LSliderStyle {
         return ZStack {
             Pentagon()
                 .fill(Color(white: color.white))
-            if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+            if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
                 Pentagon()
                     .stroke(Material.regular, style: .init(lineWidth: 2, lineJoin: .round))
             } else {
@@ -39,12 +39,12 @@ public struct GrayScaleSliderStyle: LSliderStyle {
             RoundedRectangle(cornerRadius: 10)
                 .fill(fill)
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                .stroke(Color(red: 0.500, green: 0.500, blue: 0.500, opacity: 0.800), lineWidth: 1)
         }
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct GrayScaleSlider: View {
     @Binding public var color: ColorToken
     public var sliderHeight: CGFloat = 40
@@ -68,6 +68,25 @@ public struct GrayScaleSlider: View {
 
             LSlider(Binding(get: { self.color.white}, set: { self.color = self.color.update(white: $0) }))
                 .linearSliderStyle(GrayScaleSliderStyle(color: color, sliderHeight: sliderHeight))
+        }
+    }
+}
+
+struct GrayScaleSlider_Previews: PreviewProvider {
+
+    static var previews: some View {
+        ViewWithState()
+            .previewDisplayName("Gray Scale Slider")
+    }
+
+    private struct ViewWithState : View {
+
+        @State var color: ColorToken = .init(white: 0.42)
+
+        var body: some View {
+            GrayScaleSlider($color)
+                .frame(height: 68)
+                .padding(.all, 40)
         }
     }
 }

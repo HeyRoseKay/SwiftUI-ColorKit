@@ -10,9 +10,12 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct HueSliderStyle: LSliderStyle {
-    public var sliderHeight: CGFloat 
+    public var sliderHeight: CGFloat
+
+    @Environment(\.colorScheme) var colorScheme
+
     private let hueColors = stride(from: 0, to: 1, by: 0.03).map {
         Color(hue: $0, saturation: 1, brightness: 1)
     }
@@ -22,15 +25,9 @@ public struct HueSliderStyle: LSliderStyle {
             .fill(Color(hue: configuration.pctFill, saturation: 1, brightness: 1))
             .frame(width: sliderHeight, height: sliderHeight)
             .overlay(GeometryReader { proxy in
-                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                    Circle()
-                        .stroke(Material.regular)
-                        .shadow(radius: 2)
-                } else {
-                    Circle()
-                        .stroke(Color.white)
-                        .shadow(radius: 2)
-                }
+                Circle()
+                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, lineWidth: 2)
+                    .shadow(radius: 2)
             })
     }
     
@@ -41,7 +38,7 @@ public struct HueSliderStyle: LSliderStyle {
             .stroke(gradient, style: style)
             .overlay(GeometryReader { proxy in
                 Capsule()
-                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 1)
                     .frame(width: proxy.size.width + self.sliderHeight)
                     .offset(x: -self.sliderHeight / 2)
                     .rotationEffect(configuration.angle)
@@ -50,9 +47,12 @@ public struct HueSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct SaturationBrightnessStyle: TrackPadStyle {
     public var hue: Double
+
+    @Environment(\.colorScheme) var colorScheme
+
     private var saturationColors: [Color] {
         return stride(from: 0, to: 1, by: 0.01).map {
             Color(hue: hue, saturation: $0, brightness: 1)
@@ -62,17 +62,11 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
     public func makeThumb(configuration: TrackPadConfiguration) -> some View {
         Circle()
             .fill(Color(hue: self.hue, saturation: Double(configuration.pctX), brightness: Double(1 - configuration.pctY)))
-            .frame(width: 40, height: 40)
+            .frame(width: 36, height: 36)
             .overlay(GeometryReader { proxy in
-                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                    Circle()
-                        .stroke(configuration.isActive ? Material.thin : .thick)
-                        .shadow(radius: 1)
-                } else {
-                    Circle()
-                        .stroke(configuration.isActive ? Color.white : .gray)
-                        .shadow(radius: 1)
-                }
+                Circle()
+                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, lineWidth: 2)
+                    .shadow(radius: 2)
             })
     }
 
@@ -80,7 +74,7 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
     public func makeTrack(configuration: TrackPadConfiguration) -> some View {
         let brightnessGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 1, green: 1, blue: 1), Color(red: 0, green: 0, blue: 0)]), startPoint: .top, endPoint: .bottom)
         let saturationGradient = LinearGradient(gradient: Gradient(colors: saturationColors), startPoint: .leading, endPoint: .trailing)
-        if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+        if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
             return ZStack {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(brightnessGradient)
@@ -89,7 +83,10 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
                     .fill(saturationGradient)
                     .drawingGroup(opaque: false, colorMode: .extendedLinear)
                     .blendMode(.plusDarker)
-            }.overlay(RoundedRectangle(cornerRadius: 10).stroke(Material.thin, lineWidth: 2))
+            }.overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Material.thin, lineWidth: 2)
+            )
         } else {
             return ZStack {
                 RoundedRectangle(cornerRadius: 10)
@@ -99,12 +96,15 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
                     .fill(saturationGradient)
                     .drawingGroup(opaque: false, colorMode: .extendedLinear)
                     .blendMode(.plusDarker)
-            }.overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white, lineWidth: 2))
+            }.overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 1)
+            )
         }
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct HSBColorPicker: View {
     @Binding public var color: ColorToken
     public var sliderHeight: CGFloat = 40
@@ -131,6 +131,25 @@ public struct HSBColorPicker: View {
                 .linearSliderStyle(HueSliderStyle(sliderHeight: sliderHeight))
                 .frame(height: sliderHeight)
 //                .padding(.horizontal, sliderHeight/2)
+        }
+    }
+}
+
+struct HSBColorPicker_Previews: PreviewProvider {
+
+    static var previews: some View {
+        ViewWithState()
+            .previewDisplayName("Alpha Slider")
+    }
+
+    private struct ViewWithState : View {
+
+        @State var color: ColorToken = .init(hue: 0.42, saturation: 0.42, brightness: 0.42)
+
+        var body: some View {
+            HSBColorPicker($color)
+                .frame(height: 360)
+                .padding(.all, 40)
         }
     }
 }

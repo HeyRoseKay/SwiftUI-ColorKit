@@ -10,7 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct RGBSliderStyle: LSliderStyle {
     public enum ColorType: String, CaseIterable {
         case red
@@ -20,6 +20,9 @@ public struct RGBSliderStyle: LSliderStyle {
     public var sliderHeight: CGFloat
     public var type: ColorType
     public var color: ColorToken
+
+    @Environment(\.colorScheme) var colorScheme
+
     // Creates two colors based upon what the color would look like if the value of the slider was dragged all the way left or all the way right
     private var colors: [Color] {
         switch type {
@@ -52,15 +55,9 @@ public struct RGBSliderStyle: LSliderStyle {
             .fill(currentColor)
             .frame(width: sliderHeight, height: sliderHeight)
             .overlay(GeometryReader { proxy in
-                if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
-                    Circle()
-                        .stroke(Material.regular)
-                        .shadow(radius: 2)
-                } else {
-                    Circle()
-                        .stroke(Color.white)
-                        .shadow(radius: 2)
-                }
+                Circle()
+                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, lineWidth: 2)
+                    .shadow(radius: 2)
             })
     }
 
@@ -71,7 +68,7 @@ public struct RGBSliderStyle: LSliderStyle {
             .stroke(gradient, style: style)
             .overlay(GeometryReader { proxy in
                 Capsule()
-                    .stroke(Color(red: 0.200, green: 0.200, blue: 0.200, opacity: 1.000), lineWidth: 1)
+                    .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 1)
                     .frame(width: proxy.size.width + self.sliderHeight)
                     .offset(x: -self.sliderHeight / 2)
                     .rotationEffect(configuration.angle)
@@ -80,7 +77,7 @@ public struct RGBSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct RGBColorPicker: View {
     @Binding public var color: ColorToken
     public var sliderHeights: CGFloat = 40
@@ -119,6 +116,24 @@ public struct RGBColorPicker: View {
             makeSlider( .red)
             makeSlider(.green)
             makeSlider(.blue)
+        }
+    }
+}
+
+struct RGBColorPicker_Previews: PreviewProvider {
+
+    static var previews: some View {
+        ViewWithState()
+            .previewDisplayName("RGB Picker")
+    }
+
+    private struct ViewWithState : View {
+
+        @State var color: ColorToken = .init(colorSpace: .sRGBLinear, r: 0.42, g: 0.42, b: 0.42)
+
+        var body: some View {
+            RGBColorPicker($color)
+                .padding(.all, 40)
         }
     }
 }

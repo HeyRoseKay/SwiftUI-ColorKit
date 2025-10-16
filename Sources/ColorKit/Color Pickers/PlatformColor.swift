@@ -8,11 +8,12 @@
 #if os(iOS) || os(tvOS)
 import UIKit
 public typealias PlatformColor = UIColor
-#else
+#elseif os(macOS)
 import AppKit
 public typealias PlatformColor = NSColor
 #endif
 
+#if os(iOS) || os(tvOS) || os(macOS)
 extension PlatformColor {
     
     convenience init(cmyk: (c: CGFloat, m: CGFloat, y: CGFloat, k: CGFloat)) {
@@ -26,3 +27,4 @@ extension PlatformColor {
         self.init(red: 1-C, green: 1-M, blue: 1-Y, alpha: 1)
     }
 }
+#endif

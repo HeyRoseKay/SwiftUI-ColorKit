@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct SingleColorPicker: View {
     @Binding public var color: ColorToken
 
@@ -96,14 +96,14 @@ public struct SingleColorPicker: View {
                     Text("Red: \(String(format: "%.0f", color.red*255))")
                     Text("Green: \(String(format: "%.0f", color.green*255))")
                     Text("Blue: \(String(format: "%.0f", color.blue*255))")
-                    Text(String(color.color.description))
+                    Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
                 }.foregroundColor(white > 0.5 ? Color.black : Color.white)
             } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
                 VStack {
                     Text("Hue: \(String(format: "%.0f", color.hue*360))")
                     Text("Saturation: \(String(format: "%.0f", color.saturation*100))%")
                     Text("Brightness: \(String(format: "%.0f", color.brightness*100))%")
-                    Text(String(color.color.description))
+                    Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
                 }.foregroundColor(color.brightness > 0.5 ? Color.black : Color.white)
             } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
                 VStack {
@@ -111,11 +111,12 @@ public struct SingleColorPicker: View {
                     Text("Magenta: \(String(format: "%.0f", color.magenta*100))%")
                     Text("Yellow: \(String(format: "%.0f", color.yellow*100))%")
                     Text("Black: \(String(format: "%.0f", color.keyBlack*100))%")
+                    Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
                 }.foregroundColor(color.keyBlack < 0.5 ? Color.black : Color.white)
             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
                 VStack {
                     Text("white: \(String(format: "%.0f", color.white*100))%")
-                    Text(String(color.color.description.dropFirst(4)))
+                    Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
                 }.foregroundColor(color.white > 0.5 ? Color.black : Color.white)
             }
         }
@@ -145,16 +146,15 @@ struct SingleColorPicker_Previews: PreviewProvider {
 
     static var previews: some View {
         ViewWithState()
-            .preferredColorScheme(.dark)
+            .previewDisplayName("Single Color Picker")
     }
 
     private struct ViewWithState : View {
 
-        @State var color: ColorToken = .init(colorSpace: .sRGB, r: 0, g: 0, b: 0)
+        @State var color: ColorToken = .init(colorSpace: .sRGB, r: 0.42, g: 0.42, b: 0.42)
 
         var body: some View {
             SingleColorPicker($color)
         }
     }
 }
-

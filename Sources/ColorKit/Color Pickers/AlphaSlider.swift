@@ -9,7 +9,7 @@
 import SwiftUI
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct AlphaSliderStyle: LSliderStyle {
     public var color: ColorToken
     public var sliderHeight: CGFloat = 40
@@ -19,18 +19,27 @@ public struct AlphaSliderStyle: LSliderStyle {
 
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
         ZStack {
-            Circle()
-                .fill(Color.gray)
+            if #available(iOS 26.0, macOS 26.0, watchOS 26.0, *) {
+                Circle()
+                    .glassEffect(.regular, in: .circle)
+            } else if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
+                Circle()
+                    .fill(Material.ultraThin)
+            } else {
+                Circle()
+                    .fill(Color.gray)
+            }
             Circle()
                 .fill(color.color)
         }
             .frame(width: sliderHeight, height: sliderHeight)
             .overlay(GeometryReader { proxy in
                 Circle()
-                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight)
+                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, lineWidth: 2)
                     .shadow(radius: 2)
             })
     }
+    
     public var blockHeight: CGFloat = 10
     
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
@@ -62,7 +71,7 @@ public struct AlphaSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct AlphaSlider: View {
     @Binding public var color: ColorToken
     public var sliderHeight: CGFloat = 40
@@ -79,5 +88,24 @@ public struct AlphaSlider: View {
     public var body: some View {
         LSlider(Binding(get: { self.color.alpha }, set: { self.color = self.color.update(alpha: $0) }))
             .linearSliderStyle(AlphaSliderStyle(color: color, sliderHeight: sliderHeight))
+    }
+}
+
+struct AlphaSlider_Previews: PreviewProvider {
+
+    static var previews: some View {
+        ViewWithState()
+            .previewDisplayName("Alpha Slider")
+    }
+
+    private struct ViewWithState : View {
+
+        @State var color: ColorToken = .init(colorSpace: .sRGB, r: 1, g: 1, b: 1, a: 0.42)
+
+        var body: some View {
+            AlphaSlider($color)
+                .frame(height: 40)
+                .padding(.all, 40)
+        }
     }
 }

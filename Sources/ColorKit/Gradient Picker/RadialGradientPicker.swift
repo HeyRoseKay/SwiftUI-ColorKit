@@ -19,7 +19,7 @@ import SwiftUI
 /// Then I used the `RadialKey` with the `anchorPreference` method to capture the bounds of the stop
 /// Finally I used `overlayPreferenceValue` to overlay a visible copy of the stop which used the invisible copie's bounds
 /// to restrict the translation of the view from being partaill dragged over either edge of the `RadialGradientPicker`'s gradient bar.
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct RadialStop: View {
     // Preference key used to grab the size of the stop and then adjust the maximum translation
     // so that the stop doesnts get partially dragged over the ends of the gradient bar
@@ -151,7 +151,7 @@ public struct RadialStop: View {
 ///            }
 ///        }
 /// ```
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct RadialGradientPicker: View {
     // MARK: State and Utilities
     @Environment(\.radialGradientPickerStyle) private var style: AnyRadialGradientPickerStyle

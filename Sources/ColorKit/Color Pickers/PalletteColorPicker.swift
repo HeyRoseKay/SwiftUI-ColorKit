@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct ColorPickerButton: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -28,7 +28,7 @@ public struct ColorPickerButton: ButtonStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, watchOS 6.0 , *)
+@available(iOS 13.0, macOS 10.15, *)
 public struct PalletteColorPicker: View {
     @ObservedObject public var manager: ColorManager
     public init(_ manager: ObservedObject<ColorManager>) {
@@ -141,18 +141,34 @@ public struct PalletteColorPicker: View {
     }
 
     private var buttons: some View {
-        HStack {
+        HStack(spacing: 20) {
             Button(action: self.manager.delete, label: {
-                Image(systemName: "xmark")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                
+                Group {
+                    #if os(macOS)
+                    if #available(macOS 11.0, *) {
+                        Image(systemName: "xmark")
+                    } else {
+                        Text("✕")
+                    }
+                    #else
+                    Image(systemName: "xmark")
+                    #endif
+                }
+                .font(.system(size: 34, weight: .bold))
             })
             Button(action: self.manager.add, label: {
-                Image(systemName: "plus")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                
+                Group {
+                    #if os(macOS)
+                    if #available(macOS 11.0, *) {
+                        Image(systemName: "plus")
+                    } else {
+                        Text("+")
+                    }
+                    #else
+                    Image(systemName: "plus")
+                    #endif
+                }
+                .font(.system(size: 36, weight: .bold))
             })
         }.frame(height: 30)
     }
@@ -171,5 +187,24 @@ public struct PalletteColorPicker: View {
                 .padding(.bottom, 10)
             buttons
         }.padding(.horizontal, 40)
+    }
+}
+
+struct PalletteColorPicker_Previews: PreviewProvider {
+
+    static var previews: some View {
+        ViewWithState()
+            .previewDisplayName("Pallette Color Picker")
+    }
+
+    private struct ViewWithState : View {
+
+        @ObservedObject var manager: ColorManager = ColorManager(colors: [ColorToken(hue: 0.3, saturation: 0.5, brightness: 0.5),
+             ColorToken(hue: 0.6, saturation: 0.5, brightness: 0.5),
+             ColorToken(hue: 0.9, saturation: 0.5, brightness: 0.5)])
+
+        var body: some View {
+            PalletteColorPicker(_manager)
+        }
     }
 }
