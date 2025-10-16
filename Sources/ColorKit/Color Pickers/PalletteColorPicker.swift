@@ -177,9 +177,7 @@ public struct PalletteColorPicker: View {
         VStack(spacing: 20) {
             RoundedRectangle(cornerRadius: 10)
                 .fill(self.selectedColor.wrappedValue.color)
-            Divider()
             pallette
-            Divider()
             formulationPicker
             currentColorPicker
             AlphaSlider(self.selectedColor)
