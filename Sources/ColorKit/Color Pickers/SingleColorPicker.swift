@@ -11,10 +11,12 @@ import SwiftUI
 @available(iOS 13.0, macOS 10.15, *)
 public struct SingleColorPicker: View {
     @Binding public var color: ColorToken
+    let withAlpha: Bool
 
     // MARK: - Initialization
-    public init(_ color: Binding<ColorToken>) {
+    public init(_ color: Binding<ColorToken>, withAlpha: Bool) {
         self._color = color
+        self.withAlpha = withAlpha
     }
 
     private var selectedColor: Binding<ColorToken> {
@@ -161,11 +163,15 @@ public struct SingleColorPicker: View {
                 .overlay(colorDescriptionOverlay)
 
             formulationPicker
-            currentColorPicker
-
-            AlphaSlider(self.selectedColor)
-                .frame(height: 40)
-                .padding(.bottom, 10)
+            if withAlpha {
+                currentColorPicker
+                AlphaSlider(self.selectedColor)
+                    .frame(height: 40)
+                    .padding(.bottom, 10)
+            } else {
+                currentColorPicker
+                    .padding(.bottom, 10)
+            }
         }
         .padding(.horizontal, 40)
     }
@@ -183,7 +189,7 @@ struct SingleColorPicker_Previews: PreviewProvider {
         @State var color: ColorToken = .init(colorSpace: .sRGB, r: 0.42, g: 0.42, b: 0.42)
 
         var body: some View {
-            SingleColorPicker($color)
+            SingleColorPicker($color, withAlpha: true)
         }
     }
 }

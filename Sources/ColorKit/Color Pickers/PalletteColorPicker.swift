@@ -31,8 +31,11 @@ public struct ColorPickerButton: ButtonStyle {
 @available(iOS 13.0, macOS 10.15, *)
 public struct PalletteColorPicker: View {
     @ObservedObject public var manager: ColorManager
-    public init(_ manager: ObservedObject<ColorManager>) {
+    let withAlpha: Bool
+    
+    public init(_ manager: ObservedObject<ColorManager>, withAlpha: Bool) {
         self._manager = manager
+        self.withAlpha = withAlpha
     }
   
     private var colors: [ColorToken] {
@@ -179,10 +182,15 @@ public struct PalletteColorPicker: View {
                 .fill(self.selectedColor.wrappedValue.color)
             pallette
             formulationPicker
-            currentColorPicker
-            AlphaSlider(self.selectedColor)
-                .frame(height: 40)
-                .padding(.bottom, 10)
+            if withAlpha {
+                currentColorPicker
+                AlphaSlider(self.selectedColor)
+                    .frame(height: 40)
+                    .padding(.bottom, 10)
+            } else {
+                currentColorPicker
+                    .padding(.bottom, 10)
+            }
             buttons
         }.padding(.horizontal, 40)
     }
@@ -202,7 +210,7 @@ struct PalletteColorPicker_Previews: PreviewProvider {
              ColorToken(hue: 0.9, saturation: 0.5, brightness: 0.5)])
 
         var body: some View {
-            PalletteColorPicker(_manager)
+            PalletteColorPicker(_manager, withAlpha: true)
         }
     }
 }
