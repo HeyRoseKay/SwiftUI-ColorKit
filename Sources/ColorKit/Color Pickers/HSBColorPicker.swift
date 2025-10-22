@@ -10,11 +10,10 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct HueSliderStyle: LSliderStyle {
     public var sliderHeight: CGFloat
-
-    @Environment(\.colorScheme) var colorScheme
+    let colorScheme: ColorScheme
 
     private let hueColors = stride(from: 0, to: 1, by: 0.03).map {
         Color(hue: $0, saturation: 1, brightness: 1)
@@ -47,7 +46,7 @@ public struct HueSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct SaturationBrightnessStyle: TrackPadStyle {
     public var hue: Double
 
@@ -104,11 +103,13 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct HSBColorPicker: View {
     @Binding public var color: ColorToken
     public var sliderHeight: CGFloat = 40
     
+    @Environment(\.colorScheme) var colorScheme
+
     public init(_ color: Binding<ColorToken>) {
         self._color = color
     }
@@ -128,7 +129,7 @@ public struct HSBColorPicker: View {
                 .trackPadStyle(SaturationBrightnessStyle(hue: self.color.hue))
             
             LSlider(Binding(get: {self.color.hue}, set: {self.color = self.color.update(hue: $0)}))
-                .linearSliderStyle(HueSliderStyle(sliderHeight: sliderHeight))
+                .linearSliderStyle(HueSliderStyle(sliderHeight: sliderHeight, colorScheme: colorScheme))
                 .frame(height: sliderHeight)
 //                .padding(.horizontal, sliderHeight/2)
         }
@@ -140,6 +141,7 @@ struct HSBColorPicker_Previews: PreviewProvider {
     static var previews: some View {
         ViewWithState()
             .previewDisplayName("Alpha Slider")
+            .preferredColorScheme(.dark)
     }
 
     private struct ViewWithState : View {

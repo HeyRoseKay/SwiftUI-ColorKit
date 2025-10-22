@@ -11,8 +11,8 @@ extension Color {
     // MARK: - Static Colors
     static let dimColorLight = Color(red: 0.600, green: 0.600, blue: 0.600, opacity: 0.840)
     static let dimColorDark = Color(red: 0.400, green: 0.400, blue: 0.400, opacity: 0.840)
-    static let prominentColorLight = Color(red: 0.250, green: 0.250, blue: 0.250, opacity: 1.000)
-    static let prominentColorDark = Color(red: 0.750, green: 0.750, blue: 0.750, opacity: 1.000)
+    static let prominentColorLight = Color(red: 0.400, green: 0.400, blue: 0.400, opacity: 1.000)
+    static let prominentColorDark = Color(red: 0.600, green: 0.600, blue: 0.600, opacity: 1.000)
 
     // MARK: Hex Conversion
     func toHex(for colorSpace: RGBColorSpace) -> String {

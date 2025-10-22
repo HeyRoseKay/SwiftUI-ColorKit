@@ -17,7 +17,7 @@ import CGExtender
 /// ## How It Works
 /// By calculating the direction between the stops drag location and the centers thumb location. The angle is then converted to  value between [0,1]
 /// Then the angle is constrained to between the start and end handles current angles.
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AngularStop: View {
     @Environment(\.angularGradientPickerStyle) private var style: AnyAngularGradientPickerStyle
     // MARK: Input Values
@@ -160,7 +160,7 @@ public struct AngularStop: View {
 ///          }
 ///      }
 /// ```
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AngularGradientPicker: View {
     // MARK:  State and Support Values
     @Environment(\.angularGradientPickerStyle) private var style: AnyAngularGradientPickerStyle

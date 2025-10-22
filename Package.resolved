@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CGExtender",
+        "repositoryURL": "https://github.com/HeyRoseKay/CGExtender.git",
+        "state": {
+          "branch": "master",
+          "revision": "5da73ec5c21c8bb41cbbfd47a38eded88382a679",
+          "version": null
+        }
+      },
+      {
+        "package": "bez",
+        "repositoryURL": "https://github.com/HeyRoseKay/SwiftUI-bez.git",
+        "state": {
+          "branch": "master",
+          "revision": "9d806cd58da34ef7f6992811a048836270598853",
+          "version": null
+        }
+      },
+      {
+        "package": "Shapes",
+        "repositoryURL": "https://github.com/HeyRoseKay/SwiftUI-Shapes.git",
+        "state": {
+          "branch": "master",
+          "revision": "29c61048daacf70c671aa897824de920755901ff",
+          "version": null
+        }
+      },
+      {
+        "package": "Sliders",
+        "repositoryURL": "https://github.com/HeyRoseKay/SwiftUI-Sliders.git",
+        "state": {
+          "branch": "master",
+          "revision": "35791a8b65c8be6d0c13c07e90508130f1e573b6",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

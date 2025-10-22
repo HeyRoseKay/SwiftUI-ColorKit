@@ -9,7 +9,7 @@ import SwiftUI
 
 /// A Token representing the composite data from `LinearGradient`, `RadialGradient`, and `AngularGradient` parameters
 /// When finished designing the gradient just access the `swiftUIFile` value and copy/paste it into your project. 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct GradientData: Identifiable {
     
     /// Token representing the different types of SwiftUI Gradients

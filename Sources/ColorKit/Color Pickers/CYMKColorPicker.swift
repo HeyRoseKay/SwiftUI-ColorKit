@@ -10,7 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct CMYKSliderStyle: LSliderStyle {
     public enum ColorType: String, CaseIterable {
         case cyan
@@ -21,8 +21,7 @@ public struct CMYKSliderStyle: LSliderStyle {
     public var sliderHeight: CGFloat
     public var type: ColorType
     public var color: ColorToken
-
-    @Environment(\.colorScheme) var colorScheme
+    let colorScheme: ColorScheme
 
     // Creates two colors based upon what the color would look like if the value of the slider was dragged all the way left or all the way right
     private var colors: [Color] {
@@ -79,10 +78,12 @@ public struct CMYKSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct CMYKColorPicker: View {
     @Binding public var color: ColorToken
     public var sliderHeights: CGFloat = 40
+
+    @Environment(\.colorScheme) var colorScheme
 
     public init(_ color: Binding<ColorToken>) {
         self._color = color
@@ -110,7 +111,7 @@ public struct CMYKColorPicker: View {
                                set: {self.color = self.color.update(keyBlack: $0)})
             }
         }()
-        let style = CMYKSliderStyle(sliderHeight: sliderHeights, type: color, color: self.color)
+        let style = CMYKSliderStyle(sliderHeight: sliderHeights, type: color, color: self.color, colorScheme: colorScheme)
         return LSlider(value)
             .linearSliderStyle(style)
             .frame(height: sliderHeights)
@@ -131,6 +132,7 @@ struct CMYKColorPicker_Previews: PreviewProvider {
     static var previews: some View {
         ViewWithState()
             .previewDisplayName("CMYK Picker")
+            .preferredColorScheme(.dark)
     }
 
     private struct ViewWithState : View {

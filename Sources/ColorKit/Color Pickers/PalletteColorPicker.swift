@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct ColorPickerButton: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -28,7 +28,7 @@ public struct ColorPickerButton: ButtonStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct PalletteColorPicker: View {
     @ObservedObject public var manager: ColorManager
     let withAlpha: Bool
@@ -201,6 +201,7 @@ struct PalletteColorPicker_Previews: PreviewProvider {
     static var previews: some View {
         ViewWithState()
             .previewDisplayName("Pallette Color Picker")
+            .preferredColorScheme(.dark)
     }
 
     private struct ViewWithState : View {

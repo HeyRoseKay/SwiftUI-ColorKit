@@ -10,10 +10,12 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct GrayScaleSliderStyle: LSliderStyle {
     public let color: ColorToken
     public let sliderHeight: CGFloat
+    let colorScheme: ColorScheme
+    
     private var gradient: Gradient { Gradient(colors: [Color(white: 0), Color(white: 1)]) }
     
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
@@ -23,7 +25,7 @@ public struct GrayScaleSliderStyle: LSliderStyle {
                 .fill(Color(white: color.white))
             if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
                 Pentagon()
-                    .stroke(Material.regular, style: .init(lineWidth: 2, lineJoin: .round))
+                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, style: .init(lineWidth: 2, lineJoin: .round))
             } else {
                 Pentagon()
                     .stroke(strokeColor, style: .init(lineWidth: 2, lineJoin: .round))
@@ -44,10 +46,13 @@ public struct GrayScaleSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct GrayScaleSlider: View {
     @Binding public var color: ColorToken
     public var sliderHeight: CGFloat = 40
+
+    @Environment(\.colorScheme) var colorScheme
+
     public init(_ color: Binding<ColorToken>) {
         self._color = color
     }
@@ -67,7 +72,7 @@ public struct GrayScaleSlider: View {
                 .padding(.vertical, 4)
 
             LSlider(Binding(get: { self.color.white}, set: { self.color = self.color.update(white: $0) }))
-                .linearSliderStyle(GrayScaleSliderStyle(color: color, sliderHeight: sliderHeight))
+                .linearSliderStyle(GrayScaleSliderStyle(color: color, sliderHeight: sliderHeight, colorScheme: colorScheme))
         }
     }
 }
@@ -77,6 +82,7 @@ struct GrayScaleSlider_Previews: PreviewProvider {
     static var previews: some View {
         ViewWithState()
             .previewDisplayName("Gray Scale Slider")
+            .preferredColorScheme(.dark)
     }
 
     private struct ViewWithState : View {

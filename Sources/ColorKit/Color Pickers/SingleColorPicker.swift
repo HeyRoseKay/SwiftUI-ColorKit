@@ -8,10 +8,12 @@
 
 import SwiftUI
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct SingleColorPicker: View {
     @Binding public var color: ColorToken
     let withAlpha: Bool
+
+    @Environment(\.colorScheme) var colorScheme
 
     // MARK: - Initialization
     public init(_ color: Binding<ColorToken>, withAlpha: Bool) {
@@ -24,6 +26,34 @@ public struct SingleColorPicker: View {
             return self.color
         }) {
             self.color = $0
+        }
+    }
+
+    // MARK: - Text Color Calculation
+    private var textColor: Color {
+        // If color is transparent, use environment color scheme colors
+        if color.alpha < 0.42 {
+            return colorScheme == .dark ? Color.white : Color.black
+        }
+        
+        // For opaque colors, calculate based on brightness
+        switch selectedColor.colorFormulation.wrappedValue {
+        case .rgb:
+            let white: CGFloat = (color.red + color.green + color.blue) / 3
+            return white > 0.5 ? Color.black : Color.white
+        case .hsb:
+            return color.brightness > 0.6 ? Color.black : Color.white
+        case .cmyk:
+            let black: CGFloat = (color.cyan + color.magenta + color.yellow) / 3
+            if black > 0.6 {
+                return Color.white
+            } else if color.keyBlack < 0.4 {
+                return Color.black
+            } else {
+                return Color.white
+            }
+        case .gray:
+            return color.white > 0.5 ? Color.black : Color.white
         }
     }
 
@@ -93,20 +123,19 @@ public struct SingleColorPicker: View {
     private var fullColorOverlay: some View {
         ZStack {
             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
-                let white: CGFloat = (color.red + color.green + color.blue) / 3
                 VStack {
                     Text("Red: \(String(format: "%.0f", color.red*255))")
                     Text("Green: \(String(format: "%.0f", color.green*255))")
                     Text("Blue: \(String(format: "%.0f", color.blue*255))")
                     Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                }.foregroundColor(white > 0.5 ? Color.black : Color.white)
+                }.foregroundColor(textColor)
             } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
                 VStack {
                     Text("Hue: \(String(format: "%.0f", color.hue*360))")
                     Text("Saturation: \(String(format: "%.0f", color.saturation*100))%")
                     Text("Brightness: \(String(format: "%.0f", color.brightness*100))%")
                     Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                }.foregroundColor(color.brightness > 0.5 ? Color.black : Color.white)
+                }.foregroundColor(textColor)
             } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
                 VStack {
                     Text("Cyan: \(String(format: "%.0f", color.cyan*100))%")
@@ -114,14 +143,33 @@ public struct SingleColorPicker: View {
                     Text("Yellow: \(String(format: "%.0f", color.yellow*100))%")
                     Text("Black: \(String(format: "%.0f", color.keyBlack*100))%")
                     Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                }.foregroundColor(color.keyBlack < 0.5 ? Color.black : Color.white)
+                }.foregroundColor(textColor)
             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
                 VStack {
-                    Text("white: \(String(format: "%.0f", color.white*100))%")
+                    Text("White: \(String(format: "%.0f", color.white*100))%")
                     Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                }.foregroundColor(color.white > 0.5 ? Color.black : Color.white)
+                    Text("Alpha: \(String(format: "%.0f", color.alpha*100))%")
+                }.foregroundColor(textColor)
             }
         }
+    }
+
+    private var basicColorOverlay: some View {
+        ZStack {
+             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
+                 Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                     .foregroundColor(textColor)
+             } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
+                 Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                     .foregroundColor(textColor)
+             } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
+                 Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                     .foregroundColor(textColor)
+             } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
+                 Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                     .foregroundColor(textColor)
+             }
+         }
     }
 
     private var colorDescriptionOverlay: some View {
@@ -130,22 +178,7 @@ public struct SingleColorPicker: View {
                 ViewThatFits(in: .vertical) {
                     fullColorOverlay
 
-                    ZStack {
-                        if self.selectedColor.colorFormulation.wrappedValue == .rgb {
-                            let white: CGFloat = (color.red + color.green + color.blue) / 3
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                                .foregroundColor(white > 0.5 ? Color.black : Color.white)
-                        } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                                .foregroundColor(color.brightness > 0.5 ? Color.black : Color.white)
-                        } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                                .foregroundColor(color.keyBlack < 0.5 ? Color.black : Color.white)
-                        } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                                .foregroundColor(color.white > 0.5 ? Color.black : Color.white)
-                        }
-                    }
+                    basicColorOverlay
 
                     Text("")
                 }
@@ -155,34 +188,77 @@ public struct SingleColorPicker: View {
         }
     }
 
+    // MARK: - Platform-specific Padding
+    private func applyPlatformPadding<Content: View>(to content: Content) -> some View {
+        #if os(iOS)
+        return AnyView(
+            content
+                .padding(.horizontal, 40)
+                .padding(.vertical, 10)
+        )
+        #elseif os(macOS)
+        return AnyView(
+            content
+                .padding(.horizontal, 40)
+                .padding(.bottom, 10)
+                .padding(.top, 30)
+        )
+        #else
+        return AnyView(content)
+        #endif
+    }
+
     // MARK: - View Body
     public var body: some View {
-        VStack(spacing: 20) {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(self.selectedColor.wrappedValue.color)
-                .overlay(colorDescriptionOverlay)
+        applyPlatformPadding(to:
+            VStack(spacing: 20) {
+                if #available(iOS 26.0, macOS 26.0, *) {
+                    RoundedRectangle(cornerRadius: 30)
+                        .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 2)
+                        .fill(self.selectedColor.wrappedValue.color)
+                        .overlay(colorDescriptionOverlay)
+                } else if #available(iOS 17.0, macOS 14.0, *) {
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 2)
+                        .fill(self.selectedColor.wrappedValue.color)
+                        .overlay(colorDescriptionOverlay)
+                } else {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(self.selectedColor.wrappedValue.color)
+                        .overlay(colorDescriptionOverlay)
+                }
 
-            formulationPicker
-            if withAlpha {
-                currentColorPicker
-                AlphaSlider(self.selectedColor)
-                    .frame(height: 40)
-                    .padding(.bottom, 10)
-            } else {
-                currentColorPicker
-                    .padding(.bottom, 10)
+                formulationPicker
+                if withAlpha {
+                    currentColorPicker
+                    AlphaSlider(self.selectedColor)
+                        .frame(height: 40)
+                        .padding(.bottom, 10)
+                } else {
+                    currentColorPicker
+                        .padding(.bottom, 10)
+                }
             }
-        }
-        .padding(.horizontal, 40)
+        )
     }
 }
 
 struct SingleColorPicker_Previews: PreviewProvider {
 
+    #if os(iOS)
     static var previews: some View {
         ViewWithState()
             .previewDisplayName("Single Color Picker")
+            .preferredColorScheme(.dark)
     }
+    #elseif os(macOS)
+    static var previews: some View {
+        ViewWithState()
+            .frame(height: 800)
+            .previewDisplayName("Single Color Picker")
+            .preferredColorScheme(.dark)
+    }
+    #endif
 
     private struct ViewWithState : View {
 

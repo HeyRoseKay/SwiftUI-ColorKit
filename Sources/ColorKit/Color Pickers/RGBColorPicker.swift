@@ -10,7 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct RGBSliderStyle: LSliderStyle {
     public enum ColorType: String, CaseIterable {
         case red
@@ -20,8 +20,7 @@ public struct RGBSliderStyle: LSliderStyle {
     public var sliderHeight: CGFloat
     public var type: ColorType
     public var color: ColorToken
-
-    @Environment(\.colorScheme) var colorScheme
+    let colorScheme: ColorScheme
 
     // Creates two colors based upon what the color would look like if the value of the slider was dragged all the way left or all the way right
     private var colors: [Color] {
@@ -77,11 +76,13 @@ public struct RGBSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct RGBColorPicker: View {
     @Binding public var color: ColorToken
     public var sliderHeights: CGFloat = 40
-    
+
+    @Environment(\.colorScheme) var colorScheme
+
     public init(_ color: Binding<ColorToken>) {
         self._color = color
     }
@@ -107,7 +108,7 @@ public struct RGBColorPicker: View {
         }()
         
         return LSlider(value, range: 0...1, angle: .zero)
-            .linearSliderStyle(RGBSliderStyle(sliderHeight: sliderHeights, type: color, color: self.color))
+            .linearSliderStyle(RGBSliderStyle(sliderHeight: sliderHeights, type: color, color: self.color, colorScheme: colorScheme))
             .frame(height: sliderHeights)
        }
     
@@ -125,6 +126,7 @@ struct RGBColorPicker_Previews: PreviewProvider {
     static var previews: some View {
         ViewWithState()
             .previewDisplayName("RGB Picker")
+            .preferredColorScheme(.dark)
     }
 
     private struct ViewWithState : View {

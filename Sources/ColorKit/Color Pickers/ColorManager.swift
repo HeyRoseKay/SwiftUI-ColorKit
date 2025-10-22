@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public class ColorManager: ObservableObject {
     @Published public var colors: [UUID: ColorToken]
     @Published public var selected: UUID?

@@ -9,10 +9,12 @@
 import SwiftUI
 import Sliders
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AlphaSliderStyle: LSliderStyle {
     public var color: ColorToken
     public var sliderHeight: CGFloat = 40
+    let colorScheme: ColorScheme
+
     private var gradient: Gradient { Gradient(colors: [Color.white.opacity(0), Color.white]) }
 
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
@@ -33,7 +35,6 @@ public struct AlphaSliderStyle: LSliderStyle {
             .frame(width: sliderHeight, height: sliderHeight)
             .overlay(
                 GeometryReader { proxy in
-                    @Environment(\.colorScheme) var colorScheme
                     return Circle()
                         .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, lineWidth: 2)
                         .shadow(radius: 2)
@@ -45,7 +46,6 @@ public struct AlphaSliderStyle: LSliderStyle {
     
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
         GeometryReader { proxy in
-            @Environment(\.colorScheme) var colorScheme
             ZStack {
                 VStack(spacing: 0) {
                     ForEach(0..<max(Int(proxy.size.height / self.blockHeight), 2)) { (v: Int)  in
@@ -73,11 +73,13 @@ public struct AlphaSliderStyle: LSliderStyle {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AlphaSlider: View {
     @Binding public var color: ColorToken
     public var sliderHeight: CGFloat = 40
-    
+
+    @Environment(\.colorScheme) var colorScheme
+
     public init(_ color: Binding<ColorToken>) {
         self._color = color
     }
@@ -89,7 +91,7 @@ public struct AlphaSlider: View {
     
     public var body: some View {
         LSlider(Binding(get: { self.color.alpha }, set: { self.color = self.color.update(alpha: $0) }))
-            .linearSliderStyle(AlphaSliderStyle(color: color, sliderHeight: sliderHeight))
+            .linearSliderStyle(AlphaSliderStyle(color: color, sliderHeight: sliderHeight, colorScheme: colorScheme))
     }
 }
 
@@ -98,6 +100,7 @@ struct AlphaSlider_Previews: PreviewProvider {
     static var previews: some View {
         ViewWithState()
             .previewDisplayName("Alpha Slider")
+            .preferredColorScheme(.dark)
     }
 
     private struct ViewWithState : View {

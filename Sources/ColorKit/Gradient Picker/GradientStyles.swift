@@ -11,7 +11,7 @@ import SwiftUI
 // MARK: - Configuration Structures
 
 /// Used to style the dragging view that represents a gradients start or end value
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct GradientHandleConfiguration {
     public let isActive: Bool
     public let isDragging: Bool
@@ -25,7 +25,7 @@ public struct GradientHandleConfiguration {
     }
 }
 /// Used to style a view representing a single stop in a gradient
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct GradientStopConfiguration {
     public let isActive: Bool
     public let isSelected: Bool
@@ -42,20 +42,20 @@ public struct GradientStopConfiguration {
     }
 }
 /// Used to style the draggable view representing the center of either an Angular or Radial Gradient
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct GradientCenterConfiguration {
     public let isActive: Bool
     public let isHidden: Bool
 }
 /// Used to style the slider bar the stops overlay in the `RadialGradientPicker`
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct RadialGradientBarConfiguration {
     public let gradient: Gradient
     public let isHidden: Bool
 }
 
 // MARK: -  Default Styles
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct DefaultLinearGradientPickerStyle: LinearGradientPickerStyle {
     public init() {}
     public func makeGradient(gradient: LinearGradient) -> some View {
@@ -93,7 +93,7 @@ public struct DefaultLinearGradientPickerStyle: LinearGradientPickerStyle {
         
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct DefaultRadialGradientPickerStyle: RadialGradientPickerStyle {
     public init() {}
     public func makeGradient(gradient: RadialGradient) -> some View {
@@ -147,7 +147,7 @@ public struct DefaultRadialGradientPickerStyle: RadialGradientPickerStyle {
         }
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct DefaultAngularGradientPickerStyle: AngularGradientPickerStyle {
     public init() {}
     public func makeGradient(gradient: AngularGradient) -> some View {
@@ -197,7 +197,7 @@ public struct DefaultAngularGradientPickerStyle: AngularGradientPickerStyle {
 // MARK: - Style Setup
 
 // MARK: Linear
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public protocol LinearGradientPickerStyle {
     associatedtype GradientView: View
     associatedtype StartHandle: View
@@ -209,7 +209,7 @@ public protocol LinearGradientPickerStyle {
     func makeEndHandle(configuration: GradientHandleConfiguration) -> Self.EndHandle
     func makeStop(configuration: GradientStopConfiguration) -> Self.Stop
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public extension LinearGradientPickerStyle {
     func makeGradientTypeErased(gradient: LinearGradient) -> AnyView {
         AnyView(self.makeGradient(gradient: gradient))
@@ -224,7 +224,7 @@ public extension LinearGradientPickerStyle {
         AnyView(self.makeStop(configuration: configuration))
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AnyLinearGradientPickerStyle: LinearGradientPickerStyle {
     private let _makeGradient: (LinearGradient) -> AnyView
     public func makeGradient(gradient: LinearGradient) -> some View {
@@ -252,11 +252,11 @@ public struct AnyLinearGradientPickerStyle: LinearGradientPickerStyle {
         self._makeStop = style.makeStopTypeErased
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct LinearGradientPickerStyleKey: EnvironmentKey {
     public static let defaultValue: AnyLinearGradientPickerStyle  = AnyLinearGradientPickerStyle(DefaultLinearGradientPickerStyle())
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 extension EnvironmentValues {
     public var linearGradientPickerStyle: AnyLinearGradientPickerStyle {
         get {
@@ -267,7 +267,7 @@ extension EnvironmentValues {
         }
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 extension View {
     public func linearGradientPickerStyle<S>(_ style: S) -> some View where S: LinearGradientPickerStyle {
         self.environment(\.linearGradientPickerStyle, AnyLinearGradientPickerStyle(style))
@@ -275,7 +275,7 @@ extension View {
 }
 
 // MARK:  Radial
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public protocol RadialGradientPickerStyle {
     associatedtype GradientView: View
     associatedtype Center: View
@@ -292,7 +292,7 @@ public protocol RadialGradientPickerStyle {
     func makeBar(configuration: RadialGradientBarConfiguration) -> Self.GradientBar
     
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public extension RadialGradientPickerStyle {
     func makeGradientTypeErased(gradient: RadialGradient) -> AnyView {
         AnyView(self.makeGradient(gradient: gradient))
@@ -314,7 +314,7 @@ public extension RadialGradientPickerStyle {
         AnyView(self.makeBar(configuration: configuration))
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AnyRadialGradientPickerStyle: RadialGradientPickerStyle {
     private let _makeGradient: (RadialGradient) -> AnyView
     public func makeGradient(gradient: RadialGradient) -> some View {
@@ -353,11 +353,11 @@ public struct AnyRadialGradientPickerStyle: RadialGradientPickerStyle {
         self._makeBar = style.makeBarTypeErased
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct RadialGradientPickerStyleKey: EnvironmentKey {
     public static let defaultValue: AnyRadialGradientPickerStyle  = AnyRadialGradientPickerStyle(DefaultRadialGradientPickerStyle())
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 extension EnvironmentValues {
     public var radialGradientPickerStyle: AnyRadialGradientPickerStyle {
         get {
@@ -368,7 +368,7 @@ extension EnvironmentValues {
         }
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 extension View {
     public func radialGradientPickerStyle<S>(_ style: S) -> some View where S: RadialGradientPickerStyle {
         self.environment(\.radialGradientPickerStyle, AnyRadialGradientPickerStyle(style))
@@ -376,7 +376,7 @@ extension View {
 }
 
 // MARK:  Angular
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public protocol AngularGradientPickerStyle {
     associatedtype GradientView: View
     associatedtype Center: View
@@ -391,7 +391,7 @@ public protocol AngularGradientPickerStyle {
     func makeStop(configuration: GradientStopConfiguration) -> Self.Stop
     
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public extension AngularGradientPickerStyle {
     func makeGradientTypeErased(gradient: AngularGradient) -> AnyView {
         AnyView(self.makeGradient(gradient: gradient))
@@ -409,7 +409,7 @@ public extension AngularGradientPickerStyle {
         AnyView(self.makeStop(configuration: configuration))
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AnyAngularGradientPickerStyle: AngularGradientPickerStyle {
     private let _makeGradient: (AngularGradient) -> AnyView
     public func makeGradient(gradient: AngularGradient) -> some View {
@@ -445,11 +445,11 @@ public struct AnyAngularGradientPickerStyle: AngularGradientPickerStyle {
         
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct AngularGradientPickerStyleKey: EnvironmentKey {
     public static let defaultValue: AnyAngularGradientPickerStyle  = AnyAngularGradientPickerStyle(DefaultAngularGradientPickerStyle())
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 extension EnvironmentValues {
     public var angularGradientPickerStyle: AnyAngularGradientPickerStyle {
         get {
@@ -460,7 +460,7 @@ extension EnvironmentValues {
         }
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 extension View {
     public func angularGradientPickerStyle<S>(_ style: S) -> some View where S: AngularGradientPickerStyle {
         self.environment(\.angularGradientPickerStyle, AnyAngularGradientPickerStyle(style))

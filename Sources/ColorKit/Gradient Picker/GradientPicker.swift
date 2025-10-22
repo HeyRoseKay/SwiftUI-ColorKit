@@ -9,7 +9,7 @@
 import SwiftUI
 
 // MARK: Gradient Manager
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public class GradientManager: ObservableObject {
     @Published public var gradient: GradientData
     @Published public var hideTools: Bool = false
@@ -23,7 +23,7 @@ public class GradientManager: ObservableObject {
 
 /// Example of using all three of the gradient pickers to make a single unified picker
 /// Does not have a color picker associated with so one must implement this as part of a larger view with a colorpicker 
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct GradientPicker: View {
     @ObservedObject public var manager: GradientManager
     public init(_ manager: ObservedObject<GradientManager>) {

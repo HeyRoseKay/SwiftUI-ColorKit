@@ -19,7 +19,7 @@ import CGExtender
 /// By calculating the projection of the drag gestures location onto the line segment defined between the start and end values
 /// The projected point which lies on the infinited line defined by the angle between the start and end values is then constrained to the line segment using
 /// the parametric form of the line.
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct LinearStop: View {
     @Environment(\.linearGradientPickerStyle) private var style: AnyLinearGradientPickerStyle
     @Binding var stop: GradientData.Stop
@@ -136,7 +136,7 @@ public struct LinearStop: View {
 ///      }
 ///
 ///  ```
-@available(iOS 13.0, macOS 10.15, *)
+@available(iOS 13.0, macOS 11.0, *)
 public struct LinearGradientPicker: View {
     @Environment(\.linearGradientPickerStyle) private var style: AnyLinearGradientPickerStyle
     @EnvironmentObject private var manager: GradientManager
