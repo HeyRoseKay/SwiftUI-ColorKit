@@ -27,7 +27,7 @@ public struct AlphaSliderStyle: LSliderStyle {
                     .fill(Material.ultraThin)
             } else {
                 Circle()
-                    .fill(Color.gray)
+                    .fill(colorScheme == .dark ? Color.black.opacity(0.01) : Color.white.opacity(0.01))
             }
             Circle()
                 .fill(color.color)
