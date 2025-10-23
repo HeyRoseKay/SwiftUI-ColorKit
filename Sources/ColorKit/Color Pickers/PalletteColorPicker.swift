@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+// MARK: - Color Picker Button Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct ColorPickerButton: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
@@ -28,6 +29,7 @@ public struct ColorPickerButton: ButtonStyle {
     }
 }
 
+// MARK: - Pallette Color Picker View
 @available(iOS 13.0, macOS 11.0, *)
 public struct PalletteColorPicker: View {
     @ObservedObject public var manager: ColorManager
@@ -37,7 +39,16 @@ public struct PalletteColorPicker: View {
         self._manager = manager
         self.withAlpha = withAlpha
     }
-  
+
+    private func select(_ id: UUID) {
+        if self.manager.selected == id {
+            self.manager.selected = nil
+        } else {
+            self.manager.selected = id
+        }
+    }
+
+    // MARK: - Computed Variables
     private var colors: [ColorToken] {
         Array(self.manager.colors.values).sorted(by: {$0.dateCreated > $1.dateCreated})
     }
@@ -57,15 +68,21 @@ public struct PalletteColorPicker: View {
             }
         }
     }
-    
-    private func select(_ id: UUID) {
-        if self.manager.selected == id {
-            self.manager.selected = nil
-        } else {
-            self.manager.selected = id
+
+    private var frameHeight: CGFloat {
+        switch self.selectedColor.wrappedValue.colorFormulation {
+        case .rgb:
+            220
+        case .hsb:
+            300
+        case .cmyk:
+            220
+        case .gray:
+            80
         }
     }
-    
+
+    // MARK: - Picker Views
     private var pallette: some View {
         ScrollView(.horizontal, showsIndicators: true) {
             HStack(spacing: 0) {
@@ -105,19 +122,6 @@ public struct PalletteColorPicker: View {
         }
     }
 
-    private var frameHeight: CGFloat {
-        switch self.selectedColor.wrappedValue.colorFormulation {
-        case .rgb:
-            220
-        case .hsb:
-            300
-        case .cmyk:
-            220
-        case .gray:
-            80
-        }
-    }
-
     private var currentColorPicker: some View {
         ZStack {
             rgbPicker
@@ -143,6 +147,7 @@ public struct PalletteColorPicker: View {
         .frame(height: frameHeight)
     }
 
+    // MARK: - Buttons
     private var buttons: some View {
         HStack(spacing: 20) {
             Button(action: self.manager.delete, label: {
@@ -175,7 +180,8 @@ public struct PalletteColorPicker: View {
             })
         }.frame(height: 30)
     }
-    
+
+    // MARK: - View Body
     public var body: some View {
         VStack(spacing: 20) {
             RoundedRectangle(cornerRadius: 10)
@@ -196,6 +202,7 @@ public struct PalletteColorPicker: View {
     }
 }
 
+// MARK: - Preview
 struct PalletteColorPicker_Previews: PreviewProvider {
 
     static var previews: some View {

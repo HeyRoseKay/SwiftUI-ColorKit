@@ -68,24 +68,22 @@ extension Color {
         }
     }
 
+///          Specifying color with or without leading #.
+///          2-digit format for shades of gray.
+///          3-digit format for shorthand 6-digit format.
+///          4-digit format for gray with alpha.
+///          6-digit format for RGB.
+///          8-digit format for RGBA.
+///          Automatically returns nil for all invalid formats.
+///
+///          let gray1 = Color("4f")
+///          let gray2 = Color("#68")
+///          let gray3 = Color("7813")
+///          let red = Color("f00")
+///          let translucentGreen = Color("#00FF0066")
+///          let blue = Color("0000FF")
+///          let invalid = Color("0000F")
     // MARK: Best Hex Reader
-//
-//    Specifying color with or without leading #.
-//    2-digit format for shades of gray.
-//    3-digit format for shorthand 6-digit format.
-//    4-digit format for gray with alpha.
-//    6-digit format for RGB.
-//    8-digit format for RGBA.
-//    Automatically returns nil for all invalid formats.
-//
-//    let gray1 = Color("4f")
-//    let gray2 = Color("#68")
-//    let gray3 = Color("7813")
-//    let red = Color("f00")
-//    let translucentGreen = Color("#00FF0066")
-//    let blue = Color("0000FF")
-//    let invalid = Color("0000F")
-
     init?(hex: String) {
         var str = hex
         if str.hasPrefix("#") {

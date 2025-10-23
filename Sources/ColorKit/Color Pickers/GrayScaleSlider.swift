@@ -10,6 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
+// MARK: - Gray Scale L Slider Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct GrayScaleSliderStyle: LSliderStyle {
     public let color: ColorToken
@@ -46,6 +47,7 @@ public struct GrayScaleSliderStyle: LSliderStyle {
     }
 }
 
+// MARK: - GrayScale Slider View
 @available(iOS 13.0, macOS 11.0, *)
 public struct GrayScaleSlider: View {
     @Binding public var color: ColorToken
@@ -62,7 +64,7 @@ public struct GrayScaleSlider: View {
         self.sliderHeight = sliderHeight
     }
     
-    // MARK: - Body
+    // MARK: - View Body
     public var body: some View {
         VStack {
             // MARK: - Percentage Display
@@ -77,6 +79,7 @@ public struct GrayScaleSlider: View {
     }
 }
 
+// MARK: - Preview
 struct GrayScaleSlider_Previews: PreviewProvider {
 
     static var previews: some View {

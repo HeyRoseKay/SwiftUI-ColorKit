@@ -9,8 +9,6 @@
 import SwiftUI
 import CGExtender
 
-// MARK: Stop
-
 /// # Linear Gradient Stop
 ///
 /// Draggable view used to represent a gradient stop along a `LinearGradient`
@@ -19,6 +17,8 @@ import CGExtender
 /// By calculating the projection of the drag gestures location onto the line segment defined between the start and end values
 /// The projected point which lies on the infinited line defined by the angle between the start and end values is then constrained to the line segment using
 /// the parametric form of the line.
+
+// MARK: Linear Stop View
 @available(iOS 13.0, macOS 11.0, *)
 public struct LinearStop: View {
     @Environment(\.linearGradientPickerStyle) private var style: AnyLinearGradientPickerStyle
@@ -30,17 +30,16 @@ public struct LinearStop: View {
     public let id: UUID // Used to identify the stop
     public let start: CGPoint // Current location of the start handle
     public let end: CGPoint // Current location of the end handle
-    // calculates the angle of the line segment defined by the start and end locations and the adds 90 degrees
-    // so the the handles and stops are parrallel with the gradient
+    // Calculates the Angle of the line segment defined by the start and end locations and the adds 90 degrees so the the handles and stops are parrallel with the gradient
     private var angle: Angle {
         let diff = end - start
         return Angle(radians: diff.x == 0 ? Double.pi/2 : atan(Double(diff.y/diff.x)) +  .pi/2)
     }
     // Uses the parametric form of the line defined between the start and end handles to calculate the location of the stop
     private var lerp: CGPoint {
-        
         let x = (1-stop.location)*start.x + stop.location*end.x
         let y = (1-stop.location)*start.y + stop.location*end.y
+
         return CGPoint(x: x, y: y)
     }
     private var configuration: GradientStopConfiguration {
@@ -78,7 +77,6 @@ public struct LinearStop: View {
     }
 }
 
-// MARK: Picker
 /// # Linear Gradient Picker
 ///
 /// A Component view used to create and style a `Linear Gradient` to the users liking
@@ -134,8 +132,9 @@ public struct LinearStop: View {
 ///
 ///          }
 ///      }
-///
 ///  ```
+
+// MARK: Linear Gradient Picker
 @available(iOS 13.0, macOS 11.0, *)
 public struct LinearGradientPicker: View {
     @Environment(\.linearGradientPickerStyle) private var style: AnyLinearGradientPickerStyle
@@ -143,7 +142,9 @@ public struct LinearGradientPicker: View {
     private let space: String = "Linear Gradient"
     @GestureState private var startState: DragState = .inactive // Gesture state for the start point thumb
     @GestureState private var endState: DragState = .inactive // Gesture state for the end point thumb
+
     public init() {}
+
     enum DragState {
         case inactive
         case pressing
@@ -178,7 +179,6 @@ public struct LinearGradientPicker: View {
     }
     
     // MARK: Convenience Values
-    
     /// The starts current location in unit point form
     private func currentUnitStart(_ proxy: GeometryProxy) -> UnitPoint {
         if proxy.size.width == 0 || proxy.size.height == 0 { return UnitPoint.zero }

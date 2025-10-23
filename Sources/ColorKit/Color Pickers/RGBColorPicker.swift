@@ -10,6 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
+// MARK: - RGB L Slider Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct RGBSliderStyle: LSliderStyle {
     public enum ColorType: String, CaseIterable {
@@ -49,7 +50,6 @@ public struct RGBSliderStyle: LSliderStyle {
             }
         }()
         
-        
         return Circle()
             .fill(currentColor)
             .frame(width: sliderHeight, height: sliderHeight)
@@ -76,6 +76,7 @@ public struct RGBSliderStyle: LSliderStyle {
     }
 }
 
+// MARK: - RGB Color Picker View
 @available(iOS 13.0, macOS 11.0, *)
 public struct RGBColorPicker: View {
     @Binding public var color: ColorToken
@@ -121,6 +122,7 @@ public struct RGBColorPicker: View {
     }
 }
 
+// MARK: - Preview
 struct RGBColorPicker_Previews: PreviewProvider {
 
     static var previews: some View {

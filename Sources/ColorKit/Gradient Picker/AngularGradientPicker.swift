@@ -9,7 +9,6 @@
 import SwiftUI
 import CGExtender
 
-// MARK: Stop
 /// # Angular Gradient Stop
 ///
 /// Draggable view used to represent a gradient stop along a `AngularGradient`
@@ -17,6 +16,8 @@ import CGExtender
 /// ## How It Works
 /// By calculating the direction between the stops drag location and the centers thumb location. The angle is then converted to  value between [0,1]
 /// Then the angle is constrained to between the start and end handles current angles.
+
+// MARK: Angular Stop View
 @available(iOS 13.0, macOS 11.0, *)
 public struct AngularStop: View {
     @Environment(\.angularGradientPickerStyle) private var style: AnyAngularGradientPickerStyle
@@ -73,7 +74,7 @@ public struct AngularStop: View {
             self.selected = id
         }
     }
-    // MARK: Stop Body
+
     public var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -92,8 +93,6 @@ public struct AngularStop: View {
         }
     }
 }
-
-// MARK:  Picker
 
 /// # Angular Gradient Picker
 ///
@@ -160,9 +159,10 @@ public struct AngularStop: View {
 ///          }
 ///      }
 /// ```
+
+// MARK: - Angular Gradient Picker
 @available(iOS 13.0, macOS 11.0, *)
 public struct AngularGradientPicker: View {
-    // MARK:  State and Support Values
     @Environment(\.angularGradientPickerStyle) private var style: AnyAngularGradientPickerStyle
     @EnvironmentObject private var manager: GradientManager
     private let space: String = "Angular Gradient" // Used to name the coordinate space of the picker

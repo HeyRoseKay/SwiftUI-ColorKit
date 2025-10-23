@@ -8,7 +8,8 @@
 import SwiftUI
 
 /// A Token representing the composite data from `LinearGradient`, `RadialGradient`, and `AngularGradient` parameters
-/// When finished designing the gradient just access the `swiftUIFile` value and copy/paste it into your project. 
+/// When finished designing the gradient just access the `swiftUIFile` value and copy/paste it into your project.
+// MARK: - Gradient Data
 @available(iOS 13.0, macOS 11.0, *)
 public struct GradientData: Identifiable {
     
@@ -92,6 +93,7 @@ public struct GradientData: Identifiable {
         Gradient(stops: _stops)
     }
     public var id: String {name}
+
     // MARK: Gradient To File
     /// Creates a `Gradient` to be copied and pasted into a SwiftUI project
     public var gradientFile: String {

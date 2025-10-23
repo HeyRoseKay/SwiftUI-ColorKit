@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+// MARK: - Color Token
 @available(iOS 13.0, macOS 11.0, *)
 public struct ColorToken: Identifiable {
     public enum ColorFormulation: String, CaseIterable, Identifiable {
@@ -57,7 +58,8 @@ public struct ColorToken: Identifiable {
     public var keyBlack: Double = 0.5
     
     public var alpha: Double = 1
-    
+
+    // MARK: - Computed Variables
     public var hex: String { self.color.description }
     
     public var color: Color {
@@ -85,7 +87,8 @@ public struct ColorToken: Identifiable {
             return "Color(white: \(self.white).opacity(\(alpha))"
         }
     }
-    
+
+    // MARK: - Initialization
     internal init(id: UUID,
                   date: Date,
                   name: String,
@@ -122,7 +125,8 @@ public struct ColorToken: Identifiable {
         self.alpha = alpha
         
     }
-    
+
+    // MARK: - Update ColorToken
     public func update() -> ColorToken {
         .init(id: self.id,
               date: self.dateCreated,
@@ -417,7 +421,8 @@ public extension ColorToken {
             return complementaryColors()
         }
     }
-    
+
+    // MARK: - Color Conversions
     func analgousColors() -> [ColorToken] {
         return [ColorToken(hue: (hue*360+30)/360, saturation: saturation-0.05, brightness: brightness-0.1, opacity: alpha),
                 ColorToken(hue: (hue*360+15)/360, saturation: saturation-0.05, brightness: brightness-0.05, opacity: alpha),

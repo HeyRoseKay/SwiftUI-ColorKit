@@ -10,6 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
+// MARK: - CMYK L Slider Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct CMYKSliderStyle: LSliderStyle {
     public enum ColorType: String, CaseIterable {
@@ -78,6 +79,7 @@ public struct CMYKSliderStyle: LSliderStyle {
     }
 }
 
+// MARK: - CMYK Color Picker View
 @available(iOS 13.0, macOS 11.0, *)
 public struct CMYKColorPicker: View {
     @Binding public var color: ColorToken
@@ -116,7 +118,8 @@ public struct CMYKColorPicker: View {
             .linearSliderStyle(style)
             .frame(height: sliderHeights)
     }
-    
+
+    // MARK: - View Body
     public var body: some View {
         VStack(spacing: 20) {
             makeSlider( .cyan)
@@ -127,6 +130,7 @@ public struct CMYKColorPicker: View {
     }
 }
 
+// MARK: - Preview
 struct CMYKColorPicker_Previews: PreviewProvider {
 
     static var previews: some View {

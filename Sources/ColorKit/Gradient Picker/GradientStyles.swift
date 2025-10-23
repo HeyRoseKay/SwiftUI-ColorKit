@@ -194,9 +194,7 @@ public struct DefaultAngularGradientPickerStyle: AngularGradientPickerStyle {
     }
 }
 
-// MARK: - Style Setup
-
-// MARK: Linear
+// MARK: - Linear Picker Style
 @available(iOS 13.0, macOS 11.0, *)
 public protocol LinearGradientPickerStyle {
     associatedtype GradientView: View
@@ -274,7 +272,7 @@ extension View {
     }
 }
 
-// MARK:  Radial
+// MARK: - Radial Picker Style
 @available(iOS 13.0, macOS 11.0, *)
 public protocol RadialGradientPickerStyle {
     associatedtype GradientView: View
@@ -375,7 +373,7 @@ extension View {
     }
 }
 
-// MARK:  Angular
+// MARK: - Angular Picker Style
 @available(iOS 13.0, macOS 11.0, *)
 public protocol AngularGradientPickerStyle {
     associatedtype GradientView: View

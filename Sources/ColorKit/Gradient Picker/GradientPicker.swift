@@ -22,7 +22,8 @@ public class GradientManager: ObservableObject {
 }
 
 /// Example of using all three of the gradient pickers to make a single unified picker
-/// Does not have a color picker associated with so one must implement this as part of a larger view with a colorpicker 
+/// Does not have a color picker associated with so one must implement this as part of a larger view with a colorpicker
+// MARK: - Gradient Picker View
 @available(iOS 13.0, macOS 11.0, *)
 public struct GradientPicker: View {
     @ObservedObject public var manager: GradientManager

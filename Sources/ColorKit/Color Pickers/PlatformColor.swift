@@ -14,6 +14,7 @@ public typealias PlatformColor = NSColor
 #endif
 
 #if os(iOS) || os(tvOS) || os(macOS)
+// MARK: - Platform Color
 extension PlatformColor {
     
     convenience init(cmyk: (c: CGFloat, m: CGFloat, y: CGFloat, k: CGFloat)) {

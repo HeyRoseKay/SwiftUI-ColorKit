@@ -9,6 +9,7 @@
 import SwiftUI
 import Sliders
 
+// MARK: - Alpha L Slider Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct AlphaSliderStyle: LSliderStyle {
     public var color: ColorToken
@@ -73,6 +74,7 @@ public struct AlphaSliderStyle: LSliderStyle {
     }
 }
 
+// MARK: - Alpha Slider View
 @available(iOS 13.0, macOS 11.0, *)
 public struct AlphaSlider: View {
     @Binding public var color: ColorToken
@@ -95,6 +97,7 @@ public struct AlphaSlider: View {
     }
 }
 
+// MARK: - Preview
 struct AlphaSlider_Previews: PreviewProvider {
 
     static var previews: some View {

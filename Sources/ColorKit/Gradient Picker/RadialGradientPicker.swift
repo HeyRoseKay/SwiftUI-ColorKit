@@ -8,8 +8,6 @@
 
 import SwiftUI
 
-// MARK:  Stop
-
 /// # Radial Gradient Stop
 ///
 /// Draggable view used to represent a gradient stop within a radial gradient.
@@ -19,6 +17,8 @@ import SwiftUI
 /// Then I used the `RadialKey` with the `anchorPreference` method to capture the bounds of the stop
 /// Finally I used `overlayPreferenceValue` to overlay a visible copy of the stop which used the invisible copie's bounds
 /// to restrict the translation of the view from being partaill dragged over either edge of the `RadialGradientPicker`'s gradient bar.
+
+// MARK: Radial Stop View
 @available(iOS 13.0, macOS 11.0, *)
 public struct RadialStop: View {
     // Preference key used to grab the size of the stop and then adjust the maximum translation
@@ -73,8 +73,6 @@ public struct RadialStop: View {
         }
     }
 }
-
-// MARK:  Picker
 
 /// # Radial Gradient Picker
 ///
@@ -151,23 +149,27 @@ public struct RadialStop: View {
 ///            }
 ///        }
 /// ```
+
+// MARK: Gradient Picker View
 @available(iOS 13.0, macOS 11.0, *)
 public struct RadialGradientPicker: View {
-    // MARK: State and Utilities
+    // State and Utilities
     @Environment(\.radialGradientPickerStyle) private var style: AnyRadialGradientPickerStyle
     @EnvironmentObject private var manager: GradientManager
     @State private var centerState: CGSize = .zero // Value representing the actual drag transaltion of the center thumb
     @State private var startState: Double = 0 // Value on [0,1] representing the current dragging of the start handle
     @State private var endState: Double = 0 // Value on [0,1] representing the current dragging of the end handle
     private let space: String = "Radial Gradient"  // Indentifier used to denote the pickers coordinate space
+
     public init() {}
+
     // The current Unit location of the center thumb
     private func currentCenter(_ proxy: GeometryProxy) -> UnitPoint {
         let x = manager.gradient.center.x + centerState.width/proxy.size.width
         let y = manager.gradient.center.y + centerState.height/proxy.size.height
         return UnitPoint(x: x, y: y)
     }
-    // the current position of the center thumv
+    // The current position of the center thumb
     private func currentCenter(_ proxy: GeometryProxy) -> CGPoint {
         let x = manager.gradient.center.x*proxy.size.width
         let y = manager.gradient.center.y*proxy.size.height

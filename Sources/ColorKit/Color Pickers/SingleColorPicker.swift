@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+// MARK: - Single Color Picker View
 @available(iOS 13.0, macOS 11.0, *)
 public struct SingleColorPicker: View {
     @Binding public var color: ColorToken
@@ -21,6 +22,7 @@ public struct SingleColorPicker: View {
         self.withAlpha = withAlpha
     }
 
+    // MARK: - Calculated Variables
     private var selectedColor: Binding<ColorToken> {
         Binding(get: {
             return self.color
@@ -29,7 +31,19 @@ public struct SingleColorPicker: View {
         }
     }
 
-    // MARK: - Text Color Calculation
+    private var frameHeight: CGFloat {
+        switch self.selectedColor.wrappedValue.colorFormulation {
+        case .rgb:
+            220
+        case .hsb:
+            300
+        case .cmyk:
+            220
+        case .gray:
+            80
+        }
+    }
+
     private var textColor: Color {
         // If color is transparent, use environment color scheme colors
         if color.alpha < 0.42 {
@@ -82,19 +96,6 @@ public struct SingleColorPicker: View {
         }
     }
 
-    private var frameHeight: CGFloat {
-        switch self.selectedColor.wrappedValue.colorFormulation {
-        case .rgb:
-            220
-        case .hsb:
-            300
-        case .cmyk:
-            220
-        case .gray:
-            80
-        }
-    }
-
     private var currentColorPicker: some View {
         ZStack {
             rgbPicker
@@ -120,6 +121,7 @@ public struct SingleColorPicker: View {
         .frame(height: frameHeight)
     }
 
+    // MARK: - Text Overlay
     private var fullColorOverlay: some View {
         ZStack {
             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
@@ -243,6 +245,7 @@ public struct SingleColorPicker: View {
     }
 }
 
+// MARK: - Preview
 struct SingleColorPicker_Previews: PreviewProvider {
 
     #if os(iOS)

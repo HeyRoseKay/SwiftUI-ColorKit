@@ -10,6 +10,7 @@ import SwiftUI
 import Shapes
 import Sliders
 
+// MARK: - Hue L Slider Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct HueSliderStyle: LSliderStyle {
     public var sliderHeight: CGFloat
@@ -46,11 +47,11 @@ public struct HueSliderStyle: LSliderStyle {
     }
 }
 
+// MARK: - Saturation Bright TP Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct SaturationBrightnessStyle: TrackPadStyle {
     public var hue: Double
-
-    @Environment(\.colorScheme) var colorScheme
+    let colorScheme: ColorScheme
 
     private var saturationColors: [Color] {
         return stride(from: 0, to: 1, by: 0.01).map {
@@ -103,6 +104,7 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
     }
 }
 
+// MARK: - HSB Color Picker View
 @available(iOS 13.0, macOS 11.0, *)
 public struct HSBColorPicker: View {
     @Binding public var color: ColorToken
@@ -118,7 +120,8 @@ public struct HSBColorPicker: View {
         self._color = color
         self.sliderHeight = sliderHeight
     }
-    
+
+    // MARK: - View Body
     public var body: some View {
         VStack(spacing: 20) {
             TrackPad(value: Binding(get: {CGPoint(x: self.color.saturation, y: 1 - self.color.brightness)},
@@ -126,8 +129,8 @@ public struct HSBColorPicker: View {
                                         self.color = self.color.update(saturation: Double(new.x))
                                         self.color = self.color.update(brightness: Double(1 - new.y))
             }), rangeX: 0.0...1, rangeY: 0.0...1)
-                .trackPadStyle(SaturationBrightnessStyle(hue: self.color.hue))
-            
+                .trackPadStyle(SaturationBrightnessStyle(hue: self.color.hue, colorScheme: colorScheme))
+
             LSlider(Binding(get: {self.color.hue}, set: {self.color = self.color.update(hue: $0)}))
                 .linearSliderStyle(HueSliderStyle(sliderHeight: sliderHeight, colorScheme: colorScheme))
                 .frame(height: sliderHeight)
@@ -136,6 +139,7 @@ public struct HSBColorPicker: View {
     }
 }
 
+// MARK: - Preview
 struct HSBColorPicker_Previews: PreviewProvider {
 
     static var previews: some View {
