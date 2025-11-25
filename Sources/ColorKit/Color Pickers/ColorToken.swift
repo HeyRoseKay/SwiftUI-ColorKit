@@ -10,8 +10,8 @@ import SwiftUI
 
 // MARK: - Color Token
 @available(iOS 13.0, macOS 11.0, *)
-public struct ColorToken: Identifiable {
-    public enum ColorFormulation: String, CaseIterable, Identifiable {
+public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
+    public enum ColorFormulation: String, CaseIterable, Identifiable, Decodable, Encodable, Equatable, Hashable {
         case rgb
         case hsb
         case cmyk
@@ -19,7 +19,7 @@ public struct ColorToken: Identifiable {
         
         public var id: String {self.rawValue}
     }
-    public enum RGBColorSpace: String, CaseIterable, Identifiable {
+    public enum RGBColorSpace: String, CaseIterable, Identifiable, Codable, Equatable, Hashable {
         case displayP3
         case sRGB
         case sRGBLinear
@@ -37,8 +37,8 @@ public struct ColorToken: Identifiable {
     
     public var colorFormulation: ColorFormulation
     public var rgbColorSpace: RGBColorSpace = .sRGB
-    
-    public var name: String = "New"
+
+    public var name: String = "New Color"
     public let id: UUID
     public let dateCreated: Date
     
@@ -71,7 +71,7 @@ public struct ColorToken: Identifiable {
         case .cmyk:
             return Color(PlatformColor(cmyk: (CGFloat(self.cyan), CGFloat(self.magenta), CGFloat(self.yellow), CGFloat(self.keyBlack)))).opacity(alpha)
         case .gray:
-            return Color(white: self.white).opacity(alpha)
+            return Color(self.rgbColorSpace.space, white: self.white).opacity(alpha)
         }
     }
     
@@ -84,7 +84,7 @@ public struct ColorToken: Identifiable {
         case .cmyk:
             return "Color(PlatformColor(cmyk: (\(self.cyan), \(self.magenta), \(self.yellow), \(self.keyBlack)))).opacity(\(alpha))"
         case .gray:
-            return "Color(white: \(self.white).opacity(\(alpha))"
+            return "Color(.\(self.rgbColorSpace.space), white: \(self.white).opacity(\(alpha))"
         }
     }
 
@@ -206,7 +206,6 @@ public struct ColorToken: Identifiable {
         self.alpha = alpha
         return self.update()
     }
-    
     
     // MARK: RGB Inits
     public init(r: Double, g: Double, b: Double) {
@@ -360,12 +359,27 @@ public struct ColorToken: Identifiable {
         self.white = white
         self.colorFormulation = .gray
     }
+    public init(colorSpace: RGBColorSpace, white: Double) {
+        self.id = .init()
+        self.dateCreated = .init()
+        self.white = white
+        self.colorFormulation = .gray
+        self.rgbColorSpace = colorSpace
+    }
     public init(white: Double, opacity: Double) {
         self.id = .init()
         self.dateCreated = .init()
         self.white = white
         self.alpha = opacity
         self.colorFormulation = .gray
+    }
+    public init(colorSpace: RGBColorSpace, white: Double, opacity: Double) {
+        self.id = .init()
+        self.dateCreated = .init()
+        self.white = white
+        self.alpha = opacity
+        self.colorFormulation = .gray
+        self.rgbColorSpace = colorSpace
     }
     public init(name: String, white: Double, opacity: Double) {
         self.id = .init()
@@ -374,6 +388,15 @@ public struct ColorToken: Identifiable {
         self.white = white
         self.alpha = opacity
         self.colorFormulation = .gray
+    }
+    public init(name: String, colorSpace: RGBColorSpace, white: Double, opacity: Double) {
+        self.id = .init()
+        self.dateCreated = .init()
+        self.name = name
+        self.white = white
+        self.alpha = opacity
+        self.colorFormulation = .gray
+        self.rgbColorSpace = colorSpace
     }
     public init(_ token: ColorToken) {
         self.id = .init()
@@ -393,23 +416,21 @@ public struct ColorToken: Identifiable {
         self.magenta = token.magenta
         self.yellow = token.yellow
         self.keyBlack = token.keyBlack
-        
     }
-    
 }
 
 @available(iOS 13.0, macOS 11.0, *)
 public extension ColorToken {
     
     // MARK: - Color Scheme
-    enum ColorScheme: String, CaseIterable {
+    enum ColorSchemes: String, CaseIterable {
         case analagous
         case monochromatic
         case triadic
         case complementary
     }
     
-    func colorScheme(_ type: ColorScheme) -> [ColorToken] {
+    func colorSchemes(_ type: ColorSchemes) -> [ColorToken] {
         switch (type) {
         case .analagous:
             return analgousColors()

@@ -16,7 +16,8 @@ public struct AlphaSliderStyle: LSliderStyle {
     public var sliderHeight: CGFloat = 40
     let colorScheme: ColorScheme
 
-    private var gradient: Gradient { Gradient(colors: [Color.white.opacity(0), Color.white]) }
+    private var gradient: Gradient { Gradient(colors: [Color(self.color.rgbColorSpace.space, white: 1, opacity: 0),
+                                                       Color(self.color.rgbColorSpace.space, white: 1, opacity: 1)]) }
 
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
         ZStack {

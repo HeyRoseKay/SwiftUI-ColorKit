@@ -13,17 +13,20 @@ import Sliders
 // MARK: - Gray Scale L Slider Style
 @available(iOS 13.0, macOS 11.0, *)
 public struct GrayScaleSliderStyle: LSliderStyle {
-    public let color: ColorToken
+    public var color: ColorToken
     public let sliderHeight: CGFloat
     let colorScheme: ColorScheme
     
-    private var gradient: Gradient { Gradient(colors: [Color(white: 0), Color(white: 1)]) }
-    
+    private var colors: [Color] { 
+        [Color(self.color.rgbColorSpace.space, white: 0, opacity: 1), 
+         Color(self.color.rgbColorSpace.space, white: 1, opacity: 1)] 
+    }
+
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
-        let strokeColor = Color(white: color.white < 0.75 ? 1 : 1-color.white)
+        let strokeColor = Color(white: color.white < 0.75 ? 1 : 1 - color.white)
         return ZStack {
             Pentagon()
-                .fill(Color(white: color.white))
+                .fill(Color(self.color.rgbColorSpace.space, white: color.white, opacity: 1))
             if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
                 Pentagon()
                     .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, style: .init(lineWidth: 2, lineJoin: .round))
@@ -32,12 +35,12 @@ public struct GrayScaleSliderStyle: LSliderStyle {
                     .stroke(strokeColor, style: .init(lineWidth: 2, lineJoin: .round))
             }
         }
-        .frame(width: sliderHeight/2, height: 0.66*sliderHeight)
-        .offset(x: 0, y: 0.16*sliderHeight-1.5)
+        .frame(width: sliderHeight / 2, height: 0.66 * sliderHeight)
+        .offset(x: 0, y: 0.16 * sliderHeight - 1.5)
     }
     
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
-        let fill = LinearGradient(gradient: self.gradient, startPoint: .leading, endPoint: .trailing)
+        let fill = LinearGradient(colors: colors, startPoint: .leading, endPoint: .trailing)
         return ZStack {
             RoundedRectangle(cornerRadius: 10)
                 .fill(fill)
@@ -73,7 +76,7 @@ public struct GrayScaleSlider: View {
                 .foregroundColor(.primary)
                 .padding(.vertical, 4)
 
-            LSlider(Binding(get: { self.color.white}, set: { self.color = self.color.update(white: $0) }))
+            LSlider(Binding(get: { self.color.white }, set: { self.color = self.color.update(white: $0) }))
                 .linearSliderStyle(GrayScaleSliderStyle(color: color, sliderHeight: sliderHeight, colorScheme: colorScheme))
         }
     }
@@ -90,7 +93,7 @@ struct GrayScaleSlider_Previews: PreviewProvider {
 
     private struct ViewWithState : View {
 
-        @State var color: ColorToken = .init(white: 0.42)
+        @State var color: ColorToken = .init(colorSpace: .sRGB, white: 0.42)
 
         var body: some View {
             GrayScaleSlider($color)

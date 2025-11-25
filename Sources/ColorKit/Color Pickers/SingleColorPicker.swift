@@ -40,7 +40,7 @@ public struct SingleColorPicker: View {
         case .cmyk:
             220
         case .gray:
-            80
+            120
         }
     }
 
@@ -88,19 +88,15 @@ public struct SingleColorPicker: View {
         }.pickerStyle(SegmentedPickerStyle())
     }
 
-    private var rgbPicker: some View {
-        VStack {
-            rgbColorSpacePicker
-            Spacer()
-            RGBColorPicker(self.selectedColor)
-        }
-    }
-
     private var currentColorPicker: some View {
         ZStack {
-            rgbPicker
-                .opacity(selectedColor.colorFormulation.wrappedValue == .rgb ? 1 : 0)
-                .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .rgb)
+            VStack {
+                rgbColorSpacePicker
+                Spacer()
+                RGBColorPicker(self.selectedColor)
+            }
+            .opacity(selectedColor.colorFormulation.wrappedValue == .rgb ? 1 : 0)
+            .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .rgb)
 
             HSBColorPicker(self.selectedColor)
                 .opacity(selectedColor.colorFormulation.wrappedValue == .hsb ? 1 : 0)
@@ -110,7 +106,8 @@ public struct SingleColorPicker: View {
                 .opacity(selectedColor.colorFormulation.wrappedValue == .cmyk ? 1 : 0)
                 .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .cmyk)
 
-            ZStack {
+            VStack {
+                rgbColorSpacePicker
                 GrayScaleSlider(self.selectedColor)
                     .frame(height: 68)
             }
@@ -231,8 +228,10 @@ public struct SingleColorPicker: View {
                 }
 
                 formulationPicker
+
                 if withAlpha {
                     currentColorPicker
+
                     AlphaSlider(self.selectedColor)
                         .frame(height: 40)
                         .padding(.bottom, 10)
@@ -265,7 +264,7 @@ struct SingleColorPicker_Previews: PreviewProvider {
 
     private struct ViewWithState : View {
 
-        @State var color: ColorToken = .init(colorSpace: .sRGB, r: 0.42, g: 0.42, b: 0.42)
+        @State var color: ColorToken = .init(colorSpace: .sRGB, white: 0.2)
 
         var body: some View {
             SingleColorPicker($color, withAlpha: true)
