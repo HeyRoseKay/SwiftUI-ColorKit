@@ -219,6 +219,7 @@ public struct SingleColorPicker: View {
                     if #available(iOS 17.0, *) {
                         TipView(HexInputTip(), arrowEdge: .bottom)
                             .tipImageSize(CGSizeMake(36, 36))
+                            .padding(.horizontal)
                     }
                     #endif
                 }
