@@ -1,8 +1,9 @@
 //
-//  File.swift
-//  
+//  ColorManager.swift
+//  ColorKit
 //
-//  Created by Kieran Brown on 4/12/20.
+//  Original by Kieran Brown on 4/12/20.
+//  Updates by Rose Kay in 2025.
 //
 
 import SwiftUI

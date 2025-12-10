@@ -1,9 +1,9 @@
 //
 //  ColorToken.swift
-//  MyExamples
+//  ColorKit
 //
-//  Created by Kieran Brown on 4/8/20.
-//  Copyright © 2020 BrownandSons. All rights reserved.
+//  Original by Kieran Brown on 4/8/20.
+//  Updates by Rose Kay in 2025.
 //
 
 import SwiftUI
@@ -127,84 +127,473 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
     }
 
     // MARK: - Update ColorToken
-    public func update() -> ColorToken {
-        .init(id: self.id,
-              date: self.dateCreated,
-              name: self.name,
-              formulation: self.colorFormulation,
-              rgbColorSpace: self.rgbColorSpace,
-              white: self.white,
-              red: self.red,
-              green: self.green,
-              blue: self.blue,
-              hue: self.hue,
-              saturation: self.saturation,
-              brightness: self.brightness,
-              cyan: self.cyan,
-              magenta: self.magenta,
-              yellow: self.yellow,
-              keyBlack: self.keyBlack,
-              alpha: self.alpha)
+    public mutating func update() {
+        self.syncColorRepresentations()
     }
     
-    public mutating func update(white: Double)  -> ColorToken {
+    public func updated() -> ColorToken {
+        var updated = ColorToken(id: self.id,
+                                 date: self.dateCreated,
+                                 name: self.name,
+                                 formulation: self.colorFormulation,
+                                 rgbColorSpace: self.rgbColorSpace,
+                                 white: self.white,
+                                 red: self.red,
+                                 green: self.green,
+                                 blue: self.blue,
+                                 hue: self.hue,
+                                 saturation: self.saturation,
+                                 brightness: self.brightness,
+                                 cyan: self.cyan,
+                                 magenta: self.magenta,
+                                 yellow: self.yellow,
+                                 keyBlack: self.keyBlack,
+                                 alpha: self.alpha)
+        updated.syncColorRepresentations()
+        return updated
+    }
+    
+    // MARK: - Sync Color Representations
+    private mutating func syncColorRepresentations() {
+        switch self.colorFormulation {
+        case .rgb:
+            syncFromRGB()
+        case .hsb:
+            syncFromHSB()
+        case .cmyk:
+            syncFromCMYK()
+        case .gray:
+            syncFromGray()
+        }
+    }
+    
+    private mutating func syncFromRGB() {
+        let r = self.red
+        let g = self.green
+        let b = self.blue
+        
+        let maxVal = max(r, g, b)
+        let minVal = min(r, g, b)
+        let delta = maxVal - minVal
+        
+        var h: Double = 0
+        var s: Double = 0
+        let brightness = maxVal
+        
+        if delta != 0 {
+            s = delta / maxVal
+            
+            if r == maxVal {
+                h = ((g - b) / delta).truncatingRemainder(dividingBy: 6)
+            } else if g == maxVal {
+                h = (b - r) / delta + 2
+            } else {
+                h = (r - g) / delta + 4
+            }
+            
+            h /= 6
+            if h < 0 {
+                h += 1
+            }
+        }
+        
+        self.hue = h
+        self.saturation = s
+        self.brightness = brightness
+        
+        let k = 1 - maxVal
+        var c: Double = 0
+        var m: Double = 0
+        var y: Double = 0
+        
+        if k < 1 {
+            c = (1 - r - k) / (1 - k)
+            m = (1 - g - k) / (1 - k)
+            y = (1 - b - k) / (1 - k)
+        }
+        
+        self.cyan = c
+        self.magenta = m
+        self.yellow = y
+        self.keyBlack = k
+        
+        self.white = 0.299 * r + 0.587 * g + 0.114 * b
+    }
+    
+    private mutating func syncFromHSB() {
+        let h = self.hue
+        let s = self.saturation
+        let brightness = self.brightness
+        
+        let c = brightness * s
+        let x = c * (1 - abs((h * 6).truncatingRemainder(dividingBy: 2) - 1))
+        let m = brightness - c
+        
+        var r: Double = 0
+        var g: Double = 0
+        var b: Double = 0
+        
+        let hSegment = Int(h * 6)
+        
+        switch hSegment {
+        case 0:
+            r = c; g = x; b = 0
+        case 1:
+            r = x; g = c; b = 0
+        case 2:
+            r = 0; g = c; b = x
+        case 3:
+            r = 0; g = x; b = c
+        case 4:
+            r = x; g = 0; b = c
+        default:
+            r = c; g = 0; b = x
+        }
+        
+        self.red = r + m
+        self.green = g + m
+        self.blue = b + m
+        
+        let maxVal = max(self.red, self.green, self.blue)
+        let k = 1 - maxVal
+        
+        var cyan: Double = 0
+        var magenta: Double = 0
+        var yellow: Double = 0
+        
+        if k < 1 {
+            cyan = (1 - self.red - k) / (1 - k)
+            magenta = (1 - self.green - k) / (1 - k)
+            yellow = (1 - self.blue - k) / (1 - k)
+        }
+        
+        self.cyan = cyan
+        self.magenta = magenta
+        self.yellow = yellow
+        self.keyBlack = k
+        
+        self.white = 0.299 * self.red + 0.587 * self.green + 0.114 * self.blue
+    }
+    
+    private mutating func syncFromCMYK() {
+        let c = self.cyan
+        let m = self.magenta
+        let y = self.yellow
+        let k = self.keyBlack
+        
+        self.red = (1 - c) * (1 - k)
+        self.green = (1 - m) * (1 - k)
+        self.blue = (1 - y) * (1 - k)
+        
+        let maxVal = max(self.red, self.green, self.blue)
+        let minVal = min(self.red, self.green, self.blue)
+        let delta = maxVal - minVal
+        
+        var h: Double = 0
+        var s: Double = 0
+        let brightness = maxVal
+        
+        if delta != 0 {
+            s = delta / maxVal
+            
+            if self.red == maxVal {
+                h = ((self.green - self.blue) / delta).truncatingRemainder(dividingBy: 6)
+            } else if self.green == maxVal {
+                h = (self.blue - self.red) / delta + 2
+            } else {
+                h = (self.red - self.green) / delta + 4
+            }
+            
+            h /= 6
+            if h < 0 {
+                h += 1
+            }
+        }
+        
+        self.hue = h
+        self.saturation = s
+        self.brightness = brightness
+        
+        self.white = 0.299 * self.red + 0.587 * self.green + 0.114 * self.blue
+    }
+    
+    private mutating func syncFromGray() {
+        let w = self.white
+        
+        self.red = w
+        self.green = w
+        self.blue = w
+        
+        self.hue = 0
+        self.saturation = 0
+        self.brightness = w
+        
+        self.cyan = 0
+        self.magenta = 0
+        self.yellow = 0
+        self.keyBlack = 1 - w
+    }
+    // MARK: - Update from Hex
+    @available(iOS 14.0, *)
+    public mutating func update(hex: String)  -> ColorToken {
+        guard let color = Color(hex: hex) else {
+            return self
+        }
+        switch self.colorFormulation {
+        case .rgb:
+            let platformColor = PlatformColor(color)
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            #else
+            guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
+                print("Update from Color Failed to extract RGB color components")
+                return self
+            }
+            #endif
+
+            self.red = Double(r)
+            self.green = Double(g)
+            self.blue = Double(b)
+            self.alpha = Double(o)
+            return self.updated()
+        case .hsb:
+            let platformColor = PlatformColor(color)
+            var h: CGFloat = 0
+            var s: CGFloat = 0
+            var b: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o)
+            #else
+            guard platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o) else {
+                print("Update from Color Failed to extract HSB color components")
+                return self
+            }
+            #endif
+
+            self.hue = Double(h)
+            self.saturation = Double(s)
+            self.brightness = Double(b)
+            self.alpha = Double(o)
+            return self.updated()
+        case .cmyk:
+            let platformColor = PlatformColor(color)
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            #else
+            guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
+                print("Update from Color Failed to extract RGB color components")
+                return self
+            }
+            #endif
+
+            let k = 1 - max(r, g, b)
+
+            var c: CGFloat = 0
+            var m: CGFloat = 0
+            var y: CGFloat = 0
+
+            if k < 1 {
+                c = (1 - r - k) / (1 - k)
+                m = (1 - g - k) / (1 - k)
+                y = (1 - b - k) / (1 - k)
+            }
+
+            self.cyan = Double(c)
+            self.magenta = Double(m)
+            self.yellow = Double(y)
+            self.keyBlack = Double(k)
+            self.alpha = Double(o)
+            return self.updated()
+        case .gray:
+            // convert color to grayscale
+            let platformColor = PlatformColor(color)
+            var w: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getWhite(&w, alpha: &o)
+            #else
+            guard platformColor.getWhite(&w, alpha: &o) else {
+                print("Update from Color Failed to extract Gray color components")
+                return self
+            }
+            #endif
+
+            self.white = Double(w)
+            self.alpha = Double(o)
+            return self.updated()
+        }
+    }
+    // MARK: - Update from Color
+    @available(iOS 14.0, *)
+    public mutating func update(color: Color) -> ColorToken {
+        switch self.colorFormulation {
+        case .rgb:
+            let platformColor = PlatformColor(color)
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            #else
+            guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
+                print("Update from Color Failed to extract RGB color components")
+                return self
+            }
+            #endif
+
+            self.red = Double(r)
+            self.green = Double(g)
+            self.blue = Double(b)
+            self.alpha = Double(o)
+            return self.updated()
+        case .hsb:
+            let platformColor = PlatformColor(color)
+            var h: CGFloat = 0
+            var s: CGFloat = 0
+            var b: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o)
+            #else
+            guard platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o) else {
+                print("Update from Color Failed to extract HSB color components")
+                return self
+            }
+            #endif
+
+            self.hue = Double(h)
+            self.saturation = Double(s)
+            self.brightness = Double(b)
+            self.alpha = Double(o)
+            return self.updated()
+        case .cmyk:
+            let platformColor = PlatformColor(color)
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            #else
+            guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
+                print("Update from Color Failed to extract RGB color components")
+                return self
+            }
+            #endif
+
+            let k = 1 - max(r, g, b)
+
+            var c: CGFloat = 0
+            var m: CGFloat = 0
+            var y: CGFloat = 0
+
+            if k < 1 {
+                c = (1 - r - k) / (1 - k)
+                m = (1 - g - k) / (1 - k)
+                y = (1 - b - k) / (1 - k)
+            }
+
+            self.cyan = Double(c)
+            self.magenta = Double(m)
+            self.yellow = Double(y)
+            self.keyBlack = Double(k)
+            self.alpha = Double(o)
+            return self.updated()
+        case .gray:
+            let platformColor = PlatformColor(color)
+            var w: CGFloat = 0
+            var o: CGFloat = 0
+
+            #if os(macOS)
+            platformColor.getWhite(&w, alpha: &o)
+            #else
+            guard platformColor.getWhite(&w, alpha: &o) else {
+                print("Update from Color Failed to extract Gray color components")
+                return self
+            }
+            #endif
+
+            self.white = Double(w)
+            self.alpha = Double(o)
+            return self.updated()
+        }
+    }
+    // MARK: - Update from Components
+    public mutating func update(white: Double) -> ColorToken {
         self.white = white
         self.colorFormulation = .gray
-        return self.update()
+        return self.updated()
     }
     public mutating func update(red: Double) -> ColorToken {
         self.red = red
         self.colorFormulation = .rgb
-        return self.update()
+        return self.updated()
     }
     public mutating func update(green: Double) -> ColorToken {
         self.green = green
         self.colorFormulation = .rgb
-        return self.update()
+        return self.updated()
     }
     public mutating func update(blue: Double) -> ColorToken {
         self.blue = blue
         self.colorFormulation = .rgb
-        return self.update()
+        return self.updated()
     }
     public mutating func update(hue: Double) -> ColorToken {
         self.hue = hue
         self.colorFormulation = .hsb
-        return self.update()
+        return self.updated()
     }
     public mutating func update(saturation: Double) -> ColorToken {
         self.saturation = saturation
         self.colorFormulation = .hsb
-        return self.update()
+        return self.updated()
     }
     public mutating func update(brightness: Double) -> ColorToken {
         self.brightness = brightness
         self.colorFormulation = .hsb
-        return self.update()
+        return self.updated()
     }
     public mutating func update(cyan: Double) -> ColorToken {
         self.cyan = cyan
         self.colorFormulation = .cmyk
-        return self.update()
+        return self.updated()
     }
     public mutating func update(magenta: Double) -> ColorToken {
         self.magenta = magenta
         self.colorFormulation = .cmyk
-        return self.update()
+        return self.updated()
     }
     public mutating func update(yellow: Double) -> ColorToken {
         self.yellow = yellow
         self.colorFormulation = .cmyk
-        return self.update()
+        return self.updated()
     }
     public mutating func update(keyBlack: Double) -> ColorToken {
         self.keyBlack = keyBlack
         self.colorFormulation = .cmyk
-        return self.update()
+        return self.updated()
     }
     public mutating func update(alpha: Double) -> ColorToken {
         self.alpha = alpha
-        return self.update()
+        return self.updated()
     }
     
     // MARK: RGB Inits
@@ -215,6 +604,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.green = g
         self.blue = b
         self.colorFormulation = .rgb
+        self.update()
     }
     public init(name: String, r: Double, g: Double, b: Double) {
         self.name = name
@@ -224,6 +614,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.green = g
         self.blue = b
         self.colorFormulation = .rgb
+        self.update()
     }
     public init(colorSpace: RGBColorSpace, r: Double, g: Double, b: Double) {
         self.id = .init()
@@ -233,7 +624,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.blue = b
         self.colorFormulation = .rgb
         self.rgbColorSpace = colorSpace
-        
+        self.update()
     }
     public init(name: String, colorSpace: RGBColorSpace, r: Double, g: Double, b: Double) {
         self.name = name
@@ -244,7 +635,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.blue = b
         self.colorFormulation = .rgb
         self.rgbColorSpace = colorSpace
-        
+        self.update()
     }
     public init(r: Double, g: Double, b: Double, a: Double) {
         self.id = .init()
@@ -254,6 +645,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.blue = b
         self.alpha = a
         self.colorFormulation = .rgb
+        self.update()
     }
     public init(name: String, r: Double, g: Double, b: Double, a: Double) {
         self.name = name
@@ -264,6 +656,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.blue = b
         self.alpha = a
         self.colorFormulation = .rgb
+        self.update()
     }
     public init(colorSpace: RGBColorSpace, r: Double, g: Double, b: Double, a: Double) {
         self.id = .init()
@@ -274,7 +667,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.alpha = a
         self.colorFormulation = .rgb
         self.rgbColorSpace = colorSpace
-        
+        self.update()
     }
     public init(name: String, colorSpace: RGBColorSpace, r: Double, g: Double, b: Double, a: Double) {
         self.name = name
@@ -286,7 +679,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.alpha = a
         self.colorFormulation = .rgb
         self.rgbColorSpace = colorSpace
-        
+        self.update()
     }
     // MARK: HSB Inits
     public init(hue: Double, saturation: Double, brightness: Double) {
@@ -296,6 +689,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.saturation = saturation
         self.brightness = brightness
         self.colorFormulation = .hsb
+        self.update()
     }
     public init(name: String, hue: Double, saturation: Double, brightness: Double) {
         self.id = .init()
@@ -305,6 +699,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.saturation = saturation
         self.brightness = brightness
         self.colorFormulation = .hsb
+        self.update()
     }
     public init(hue: Double, saturation: Double, brightness: Double, opacity: Double) {
         self.id = .init()
@@ -314,6 +709,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.brightness = brightness
         self.alpha = opacity
         self.colorFormulation = .hsb
+        self.update()
     }
     public init(name: String, hue: Double, saturation: Double, brightness: Double, opacity: Double) {
         self.id = .init()
@@ -324,6 +720,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.brightness = brightness
         self.alpha = opacity
         self.colorFormulation = .hsb
+        self.update()
     }
     // MARK: CMYK Inits
     public init(cyan: Double, magenta: Double, yellow: Double, keyBlack: Double) {
@@ -334,6 +731,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.yellow = yellow
         self.keyBlack = keyBlack
         self.colorFormulation = .cmyk
+        self.update()
     }
     public init(name: String, cyan: Double, magenta: Double, yellow: Double, keyBlack: Double) {
         self.id = .init()
@@ -344,6 +742,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.yellow = yellow
         self.keyBlack = keyBlack
         self.colorFormulation = .cmyk
+        self.update()
     }
     // MARK: White Inits
     public init(white: Double) {
@@ -351,6 +750,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.dateCreated = .init()
         self.white = white
         self.colorFormulation = .gray
+        self.update()
     }
     public init(name: String, white: Double) {
         self.id = .init()
@@ -358,6 +758,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.name = name
         self.white = white
         self.colorFormulation = .gray
+        self.update()
     }
     public init(colorSpace: RGBColorSpace, white: Double) {
         self.id = .init()
@@ -365,6 +766,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.white = white
         self.colorFormulation = .gray
         self.rgbColorSpace = colorSpace
+        self.update()
     }
     public init(white: Double, opacity: Double) {
         self.id = .init()
@@ -372,6 +774,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.white = white
         self.alpha = opacity
         self.colorFormulation = .gray
+        self.update()
     }
     public init(colorSpace: RGBColorSpace, white: Double, opacity: Double) {
         self.id = .init()
@@ -380,6 +783,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.alpha = opacity
         self.colorFormulation = .gray
         self.rgbColorSpace = colorSpace
+        self.update()
     }
     public init(name: String, white: Double, opacity: Double) {
         self.id = .init()
@@ -388,6 +792,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.white = white
         self.alpha = opacity
         self.colorFormulation = .gray
+        self.update()
     }
     public init(name: String, colorSpace: RGBColorSpace, white: Double, opacity: Double) {
         self.id = .init()
@@ -397,6 +802,7 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
         self.alpha = opacity
         self.colorFormulation = .gray
         self.rgbColorSpace = colorSpace
+        self.update()
     }
     public init(_ token: ColorToken) {
         self.id = .init()

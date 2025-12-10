@@ -1,9 +1,9 @@
 //
 //  HSBColorPicker.swift
-//  MyExamples
+//  ColorKit
 //
-//  Created by Kieran Brown on 4/7/20.
-//  Copyright © 2020 BrownandSons. All rights reserved.
+//  Original by Kieran Brown on 4/7/20.
+//  Updates by Rose Kay in 2025.
 //
 
 import SwiftUI
@@ -144,7 +144,7 @@ struct HSBColorPicker_Previews: PreviewProvider {
 
     static var previews: some View {
         ViewWithState()
-            .previewDisplayName("Alpha Slider")
+            .previewDisplayName("HSB Rectangle Picker")
             .preferredColorScheme(.dark)
     }
 

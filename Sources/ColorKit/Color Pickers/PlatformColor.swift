@@ -1,9 +1,10 @@
 //
 //  PlatformColor.swift
-//  
+//  ColorKit
 //
-//  Created by Kieran Brown on 4/13/20.
-//
+//  Original by Kieran Brown on 4/13/20.
+//  Updates by Rose Kay in 2025.
+// 
 
 #if os(iOS) || os(tvOS)
 import UIKit
