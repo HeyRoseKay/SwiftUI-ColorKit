@@ -7,6 +7,32 @@
 // 
 
 import SwiftUI
+#if os(iOS)
+import TipKit
+#endif
+
+// MARK: - Hex Input Tip
+#if os(iOS)
+@available(iOS 17.0, *)
+struct HexInputTip: Tip {
+    var title: Text {
+        Text("Hex Color Input")
+    }
+    
+    var message: Text? {
+        Text("Enter hex code with/out the #. Supports (2) Gray, (3) RGB, (4) Gray/Alpha, (6) RRGGBB, (8) RRGGBBAA formats!!")
+    }
+    
+    var image: Image? {
+        Image(systemName: "number.circle")
+    }
+
+    @available(iOS 18.0, *)
+    var options: [any Option] {
+        [MaxDisplayDuration(150.0)]
+    }
+}
+#endif
 
 // MARK: - Single Color Picker View
 @available(iOS 13.0, macOS 11.0, *)
@@ -14,6 +40,8 @@ public struct SingleColorPicker: View {
     @Binding public var color: ColorToken
     @State private var hexText: String = ""
     @State private var isShowingRadialHSB: Bool = false
+    @State private var hexError: HexValidationError?
+    @State private var showError: Bool = false
 
     let withAlpha: Bool
 
@@ -156,48 +184,106 @@ public struct SingleColorPicker: View {
     private var fullPlusHexColorOverlay: some View {
         ZStack {
             VStack {
-                if self.selectedColor.colorFormulation.wrappedValue == .rgb {
-                    VStack {
-                        Text("Red: \(String(format: "%.0f", color.red*255))")
-                        Text("Green: \(String(format: "%.0f", color.green*255))")
-                        Text("Blue: \(String(format: "%.0f", color.blue*255))")
-                        Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                    }.foregroundColor(textColor)
-                } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
-                    VStack {
-                        Text("Hue: \(String(format: "%.0f", color.hue*360))")
-                        Text("Saturation: \(String(format: "%.0f", color.saturation*100))%")
-                        Text("Brightness: \(String(format: "%.0f", color.brightness*100))%")
-                        Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                    }.foregroundColor(textColor)
-                } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
-                    VStack {
-                        Text("Cyan: \(String(format: "%.0f", color.cyan*100))%")
-                        Text("Magenta: \(String(format: "%.0f", color.magenta*100))%")
-                        Text("Yellow: \(String(format: "%.0f", color.yellow*100))%")
-                        Text("Black: \(String(format: "%.0f", color.keyBlack*100))%")
-                        Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                    }.foregroundColor(textColor)
-                } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
-                    VStack {
-                        Text("White: \(String(format: "%.0f", color.white*100))%")
-                        Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                        Text("Alpha: \(String(format: "%.0f", color.alpha*100))%")
-                    }.foregroundColor(textColor)
-                }
-                TextField("Hex Input", text: $hexText, prompt: Text(" # Hex Input"))
-                    .textFieldStyle(.roundedBorder)
-                    .clipShape(.capsule)
-                    .overlay(content: {
-                        Capsule()
-                            .stroke(colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42), lineWidth: 2.4)
-                    })
-                    .frame(maxWidth: 112)
-                    .padding(.top, 8)
-                    .submitLabel(.done)
-                    .onSubmit {
-                        self.color = self.color.update(hex: hexText)
+                ZStack {
+                    if self.selectedColor.colorFormulation.wrappedValue == .rgb {
+                        VStack {
+                            Text("Red: \(String(format: "%.0f", color.red*255))")
+                            Text("Green: \(String(format: "%.0f", color.green*255))")
+                            Text("Blue: \(String(format: "%.0f", color.blue*255))")
+                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                        }.foregroundColor(textColor)
+                    } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
+                        VStack {
+                            Text("Hue: \(String(format: "%.0f", color.hue*360))")
+                            Text("Saturation: \(String(format: "%.0f", color.saturation*100))%")
+                            Text("Brightness: \(String(format: "%.0f", color.brightness*100))%")
+                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                        }.foregroundColor(textColor)
+                    } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
+                        VStack {
+                            Text("Cyan: \(String(format: "%.0f", color.cyan*100))%")
+                            Text("Magenta: \(String(format: "%.0f", color.magenta*100))%")
+                            Text("Yellow: \(String(format: "%.0f", color.yellow*100))%")
+                            Text("Black: \(String(format: "%.0f", color.keyBlack*100))%")
+                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                        }.foregroundColor(textColor)
+                    } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
+                        VStack {
+                            Text("White: \(String(format: "%.0f", color.white*100))%")
+                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
+                            Text("Alpha: \(String(format: "%.0f", color.alpha*100))%")
+                        }.foregroundColor(textColor)
                     }
+
+                    #if os(iOS)
+                    if #available(iOS 17.0, *) {
+                        TipView(HexInputTip(), arrowEdge: .bottom)
+                            .tipImageSize(CGSizeMake(36, 36))
+                    }
+                    #endif
+                }
+
+                VStack(spacing: 4) {
+                    if #available(iOS 17.0, *) {
+                        TextField("Hex Input", text: $hexText, prompt: Text(" # Hex Input"))
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.characters)
+                            .textFieldStyle(.roundedBorder)
+                            .clipShape(.capsule)
+                            .overlay(content: {
+                                Capsule()
+                                    .stroke(
+                                        showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
+                                        lineWidth: 2.4
+                                    )
+                            })
+                            .frame(maxWidth: 112)
+                            .padding(.top, 8)
+                            .submitLabel(.done)
+                            .onChange(of: hexText) {
+                                showError = false
+                                hexError = nil
+                            }
+                            .onSubmit {
+                                validateAndApplyHex()
+                            }
+                    } else {
+                        TextField("Hex Input", text: $hexText, prompt: Text(" # Hex Input"))
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.characters)
+                            .textFieldStyle(.roundedBorder)
+                            .clipShape(.capsule)
+                            .overlay(content: {
+                                Capsule()
+                                    .stroke(
+                                        showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
+                                        lineWidth: 2.4
+                                    )
+                            })
+                            .frame(maxWidth: 112)
+                            .padding(.top, 8)
+                            .submitLabel(.done)
+                            .onSubmit {
+                                validateAndApplyHex()
+                            }
+                    }
+                    
+                    if showError, let error = hexError {
+                        VStack(spacing: 2) {
+                            Text(error.errorDescription ?? "Invalid hex")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                            if let suggestion = error.recoverySuggestion {
+                                Text(suggestion)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.top, 4)
+                        .padding(.horizontal, 8)
+                        .multilineTextAlignment(.center)
+                    }
+                }
             }
         }
     }
@@ -309,11 +395,23 @@ public struct SingleColorPicker: View {
     // MARK: - View Body
     public var body: some View {
         #if os(iOS)
-        if #available(iOS 14.0, *) {
+        if #available(iOS 15.0, *) {
             mainContentView
                 .padding(.horizontal, 40)
                 .padding(.vertical, 10)
                 .ignoresSafeArea(.keyboard)
+                .task {
+                    if #available(iOS 17.0, *) {
+//                        #if DEBUG
+//                        try? Tips.resetDatastore()
+//                        #endif
+                        
+                        try? Tips.configure([
+                            .displayFrequency(.daily),
+                            .datastoreLocation(.applicationDefault)
+                        ])
+                    }
+                }
         } else {
             mainContentView
                 .padding(.horizontal, 40)
@@ -327,6 +425,29 @@ public struct SingleColorPicker: View {
         #else
         mainContentView
         #endif
+    }
+    
+    // MARK: - Helper Methods
+    private func validateAndApplyHex() {
+        let validationResult = HexValidator.validate(hexText)
+        
+        switch validationResult {
+        case .success(let validHex):
+            if #available(iOS 14.0, macOS 11.0, *) {
+                self.color = self.color.update(hex: validHex)
+                hexText = ""
+                showError = false
+                hexError = nil
+            }
+        case .failure(let error):
+            hexError = error
+            showError = true
+            
+            #if os(iOS)
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+            #endif
+        }
     }
 }
 

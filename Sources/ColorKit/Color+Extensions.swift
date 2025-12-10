@@ -68,7 +68,7 @@ extension Color {
         }
     }
 
-///          Specifying color with or without leading #.
+///          Specifying color with or without leading # or 0x.
 ///          2-digit format for shades of gray.
 ///          3-digit format for shorthand 6-digit format.
 ///          4-digit format for gray with alpha.
@@ -85,10 +85,18 @@ extension Color {
 ///          let invalid = Color("0000F")
     // MARK: Best Hex Reader
     init?(hex: String) {
-        var str = hex
+        var str = hex.trimmingCharacters(in: .whitespaces)
+        
         if str.hasPrefix("#") {
             str.removeFirst()
         }
+        
+        // Handle common prefixes
+        if str.hasPrefix("0x") || str.hasPrefix("0X") {
+            str = String(str.dropFirst(2))
+        }
+        
+        // Expand 3-digit shorthand to 6-digit
         if str.count == 3 {
             str = String(repeating: str[str.startIndex], count: 2)
             + String(repeating: str[str.index(str.startIndex, offsetBy: 1)], count: 2)
@@ -96,10 +104,12 @@ extension Color {
         } else if !str.count.isMultiple(of: 2) || str.count > 8 {
             return nil
         }
+        
         guard let color = UInt64(str, radix: 16)
         else {
             return nil
         }
+        
         if str.count == 2 {
             let gray = Double(Int(color) & 0xFF) / 255
             self.init(.sRGB, red: gray, green: gray, blue: gray, opacity: 1)
@@ -121,5 +131,69 @@ extension Color {
         } else {
             return nil
         }
+    }
+}
+
+// MARK: - Hex Validation
+enum HexValidationError: LocalizedError {
+    case tooManyCharacters
+    case invalidCharacters
+    case oddNumberOfCharacters
+    case empty
+
+    var errorDescription: String? {
+        switch self {
+        case .tooManyCharacters:
+            return "Hex code too long (max 8 characters)"
+        case .invalidCharacters:
+            return "Only 0-9 and A-F allowed"
+        case .oddNumberOfCharacters:
+            return "Must be 2, 3, 4, 6, or 8 characters"
+        case .empty:
+            return "Enter a hex code"
+        }
+    }
+
+    var recoverySuggestion: String? {
+        switch self {
+        case .tooManyCharacters:
+            return "Remove extra characters"
+        case .invalidCharacters:
+            return "Use only hexadecimal characters"
+        case .oddNumberOfCharacters:
+            return "Valid formats: (2) Gray, (3) RGB, (4) Gray/Alpha, (6) RRGGBB, (8) RRGGBBAA"
+        case .empty:
+            return "Try: FF0000 for red"
+        }
+    }
+}
+
+struct HexValidator {
+    static func validate(_ hex: String) -> Result<String, HexValidationError> {
+        var str = hex.trimmingCharacters(in: .whitespaces)
+
+        if str.hasPrefix("#") {
+            str.removeFirst()
+        }
+
+        if str.isEmpty {
+            return .failure(.empty)
+        }
+
+        if str.count > 8 {
+            return .failure(.tooManyCharacters)
+        }
+
+        let validHexCharacters = CharacterSet(charactersIn: "0123456789ABCDEFabcdef")
+        if str.rangeOfCharacter(from: validHexCharacters.inverted) != nil {
+            return .failure(.invalidCharacters)
+        }
+
+        let validLengths = [2, 3, 4, 6, 8]
+        if !validLengths.contains(str.count) {
+            return .failure(.oddNumberOfCharacters)
+        }
+
+        return .success(str)
     }
 }
