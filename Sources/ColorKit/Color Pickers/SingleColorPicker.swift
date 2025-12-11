@@ -38,10 +38,17 @@ struct HexInputTip: Tip {
 @available(iOS 13.0, macOS 11.0, *)
 public struct SingleColorPicker: View {
     @Binding public var color: ColorToken
-    @State private var hexText: String = ""
     @State private var isShowingRadialHSB: Bool = false
     @State private var hexError: HexValidationError?
     @State private var showError: Bool = false
+    @State private var privateText: String = ""
+    private var hexText: Binding<String> {
+        Binding {
+            self.privateText
+        } set: { newVal in
+            self.privateText = newVal.uppercased()
+        }
+    }
 
     let withAlpha: Bool
 
@@ -117,6 +124,102 @@ public struct SingleColorPicker: View {
                 Text(space.rawValue).tag(space)
             }
         }.pickerStyle(SegmentedPickerStyle())
+    }
+
+    @available(iOS 15.0, macOS 13.0, *)
+    private var hexInputField: some View {
+        Group {
+            if #available(iOS 17.0, macOS 14.0, *) {
+                #if os(iOS)
+                TextField("Hex Input", text: hexText, prompt: Text(" # Hex Input"))
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.characters)
+                    .textFieldStyle(.roundedBorder)
+                    .clipShape(.capsule)
+                    .overlay(content: {
+                        Capsule()
+                            .stroke(
+                                showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
+                                lineWidth: 2.4
+                            )
+                    })
+                    .frame(maxWidth: 112)
+                    .padding(.top, 8)
+                    .submitLabel(.done)
+                    .onChange(of: hexText.wrappedValue) {
+                        showError = false
+                        hexError = nil
+                    }
+                    .onSubmit {
+                        validateAndApplyHex()
+                    }
+                #else
+                TextField("Hex Input", text: hexText, prompt: Text(" # Hex Input"))
+                    .autocorrectionDisabled()
+                    .textFieldStyle(.roundedBorder)
+                    .clipShape(.capsule)
+                    .overlay(content: {
+                        Capsule()
+                            .stroke(
+                                showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
+                                lineWidth: 2.4
+                            )
+                    })
+                    .frame(maxWidth: 112)
+                    .padding(.top, 8)
+                    .submitLabel(.done)
+                    .onChange(of: hexText.wrappedValue) {
+                        showError = false
+                        hexError = nil
+                    }
+                    .onSubmit {
+                        validateAndApplyHex()
+                    }
+                #endif
+            } else {
+                TextField("Hex Input", text: hexText, prompt: Text(" # Hex Input"))
+                    .autocorrectionDisabled()
+                    .textFieldStyle(.roundedBorder)
+                    .clipShape(.capsule)
+                    .overlay(content: {
+                        Capsule()
+                            .stroke(
+                                showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
+                                lineWidth: 2.4
+                            )
+                    })
+                    .frame(maxWidth: 112)
+                    .padding(.top, 8)
+                    .submitLabel(.done)
+                    .onSubmit {
+                        validateAndApplyHex()
+                    }
+            }
+        }
+    }
+
+
+    @available(iOS 15.0, macOS 13.0, *)
+    private var hexInputSection: some View {
+        VStack(spacing: 4) {
+            hexInputField
+            
+            if showError, let error = hexError {
+                VStack(spacing: 2) {
+                    Text(error.errorDescription ?? "Invalid hex")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                    if let suggestion = error.recoverySuggestion {
+                        Text(suggestion)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.top, 4)
+                .padding(.horizontal, 8)
+                .multilineTextAlignment(.center)
+            }
+        }
     }
 
     private var hsbColorPickers: some View {
@@ -224,67 +327,7 @@ public struct SingleColorPicker: View {
                     #endif
                 }
 
-                VStack(spacing: 4) {
-                    if #available(iOS 17.0, *) {
-                        TextField("Hex Input", text: $hexText, prompt: Text(" # Hex Input"))
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.characters)
-                            .textFieldStyle(.roundedBorder)
-                            .clipShape(.capsule)
-                            .overlay(content: {
-                                Capsule()
-                                    .stroke(
-                                        showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
-                                        lineWidth: 2.4
-                                    )
-                            })
-                            .frame(maxWidth: 112)
-                            .padding(.top, 8)
-                            .submitLabel(.done)
-                            .onChange(of: hexText) {
-                                showError = false
-                                hexError = nil
-                            }
-                            .onSubmit {
-                                validateAndApplyHex()
-                            }
-                    } else {
-                        TextField("Hex Input", text: $hexText, prompt: Text(" # Hex Input"))
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.characters)
-                            .textFieldStyle(.roundedBorder)
-                            .clipShape(.capsule)
-                            .overlay(content: {
-                                Capsule()
-                                    .stroke(
-                                        showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
-                                        lineWidth: 2.4
-                                    )
-                            })
-                            .frame(maxWidth: 112)
-                            .padding(.top, 8)
-                            .submitLabel(.done)
-                            .onSubmit {
-                                validateAndApplyHex()
-                            }
-                    }
-                    
-                    if showError, let error = hexError {
-                        VStack(spacing: 2) {
-                            Text(error.errorDescription ?? "Invalid hex")
-                                .font(.caption)
-                                .foregroundColor(.red)
-                            if let suggestion = error.recoverySuggestion {
-                                Text(suggestion)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .padding(.top, 4)
-                        .padding(.horizontal, 8)
-                        .multilineTextAlignment(.center)
-                    }
-                }
+                hexInputSection
             }
         }
     }
@@ -430,13 +473,13 @@ public struct SingleColorPicker: View {
     
     // MARK: - Helper Methods
     private func validateAndApplyHex() {
-        let validationResult = HexValidator.validate(hexText)
-        
+        let validationResult = HexValidator.validate(hexText.wrappedValue)
+
         switch validationResult {
         case .success(let validHex):
             if #available(iOS 14.0, macOS 11.0, *) {
                 self.color = self.color.update(hex: validHex)
-                hexText = ""
+                hexText.wrappedValue = ""
                 showError = false
                 hexError = nil
             }
