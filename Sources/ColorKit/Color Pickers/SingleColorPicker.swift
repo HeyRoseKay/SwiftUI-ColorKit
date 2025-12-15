@@ -446,14 +446,12 @@ public struct SingleColorPicker: View {
                 .ignoresSafeArea(.keyboard)
                 .task {
                     if #available(iOS 17.0, *) {
-//                        #if DEBUG
-//                        try? Tips.resetDatastore()
-//                        #endif
-                        
-                        try? Tips.configure([
-                            .displayFrequency(.daily),
-                            .datastoreLocation(.applicationDefault)
-                        ])
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 4.2) {
+                            try? Tips.configure([
+                                .displayFrequency(.daily),
+                                .datastoreLocation(.applicationDefault)
+                            ])
+                        }
                     }
                 }
         } else {
