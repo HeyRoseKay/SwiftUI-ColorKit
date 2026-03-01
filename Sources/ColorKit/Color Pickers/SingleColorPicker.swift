@@ -88,25 +88,9 @@ public struct SingleColorPicker: View {
             return colorScheme == .dark ? Color.white : Color.black
         }
         
-        // For opaque colors, calculate based on brightness
-        switch selectedColor.colorFormulation.wrappedValue {
-        case .rgb:
-            let white: CGFloat = (color.red + color.green + color.blue) / 3
-            return white > 0.5 ? Color.black : Color.white
-        case .hsb:
-            return color.brightness > 0.6 ? Color.black : Color.white
-        case .cmyk:
-            let black: CGFloat = (color.cyan + color.magenta + color.yellow) / 3
-            if black > 0.6 {
-                return Color.white
-            } else if color.keyBlack < 0.4 {
-                return Color.black
-            } else {
-                return Color.white
-            }
-        case .gray:
-            return color.white > 0.5 ? Color.black : Color.white
-        }
+        // Because Color Formulations are now Synced just check Luminance
+        let luminance = (0.299 * color.red + (0.587 * color.green) + (0.114 * color.blue)
+        return luminance < 0.5 ? Color.white : Color.black
     }
 
     // MARK: - Picker Components
@@ -139,8 +123,8 @@ public struct SingleColorPicker: View {
                     .overlay(content: {
                         Capsule()
                             .stroke(
-                                showError ? Color.red : (colorScheme == .dark ? Color.dimColorDark.opacity(0.42) : Color.dimColorLight.opacity(0.42)),
-                                lineWidth: 2.4
+                                showError ? Color.red.opacity(0.84) : (colorScheme == .dark ? Color.dimColorDark.opacity(0.84) : Color.dimColorLight.opacity(0.84)),
+                                lineWidth: 2.1
                             )
                     })
                     .frame(maxWidth: 112)
