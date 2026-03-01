@@ -89,7 +89,7 @@ public struct SingleColorPicker: View {
         }
         
         // Because Color Formulations are now Synced just check Luminance
-        let luminance = (0.299 * color.red + (0.587 * color.green) + (0.114 * color.blue)
+        let luminance = (0.299 * color.red) + (0.587 * color.green) + (0.114 * color.blue)
         return luminance < 0.5 ? Color.white : Color.black
     }
 
