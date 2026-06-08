@@ -51,13 +51,15 @@ public struct SingleColorPicker: View {
     }
 
     let withAlpha: Bool
+    private let lastFormulation: Binding<ColorToken.ColorFormulation>?
 
     @Environment(\.colorScheme) var colorScheme
 
     // MARK: - Initialization
-    public init(_ color: Binding<ColorToken>, withAlpha: Bool) {
+    public init(_ color: Binding<ColorToken>, withAlpha: Bool, lastFormulation: Binding<ColorToken.ColorFormulation>? = nil) {
         self._color = color
         self.withAlpha = withAlpha
+        self.lastFormulation = lastFormulation
     }
 
     // MARK: - Calculated Variables
@@ -110,8 +112,17 @@ public struct SingleColorPicker: View {
     }
 
     // MARK: - Picker Components
+    private var formulationBinding: Binding<ColorToken.ColorFormulation> {
+        Binding {
+            color.colorFormulation
+        } set: { newVal in
+            color.colorFormulation = newVal
+            lastFormulation?.wrappedValue = newVal
+        }
+    }
+
     private var formulationPicker: some View {
-        Picker(selection: self.selectedColor.colorFormulation, label: Text("Color Formulation")) {
+        Picker(selection: formulationBinding, label: Text("Color Formulation")) {
             ForEach(ColorToken.ColorFormulation.allCases) { (formulation)  in
                 Text(formulation.rawValue).tag(formulation)
             }
@@ -432,6 +443,11 @@ public struct SingleColorPicker: View {
             } else {
                 currentColorPicker
                     .padding(.bottom, 10)
+            }
+        }
+        .onAppear {
+            if let lastFormulation {
+                color.colorFormulation = lastFormulation.wrappedValue
             }
         }
     }
