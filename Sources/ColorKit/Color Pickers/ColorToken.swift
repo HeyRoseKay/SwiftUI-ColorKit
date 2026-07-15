@@ -348,7 +348,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.sRGB) ?? platformColor
+            resolvedColor.getRed(&r, green: &g, blue: &b, alpha: &o)
             #else
             guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
                 print("Update from Color Failed to extract RGB color components")
@@ -369,7 +370,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.sRGB) ?? platformColor
+            resolvedColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o)
             #else
             guard platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o) else {
                 print("Update from Color Failed to extract HSB color components")
@@ -390,7 +392,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.sRGB) ?? platformColor
+            resolvedColor.getRed(&r, green: &g, blue: &b, alpha: &o)
             #else
             guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
                 print("Update from Color Failed to extract RGB color components")
@@ -423,7 +426,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getWhite(&w, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.genericGamma22Gray) ?? platformColor
+            resolvedColor.getWhite(&w, alpha: &o)
             #else
             guard platformColor.getWhite(&w, alpha: &o) else {
                 print("Update from Color Failed to extract Gray color components")
@@ -448,7 +452,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.sRGB) ?? platformColor
+            resolvedColor.getRed(&r, green: &g, blue: &b, alpha: &o)
             #else
             guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
                 print("Update from Color Failed to extract RGB color components")
@@ -469,7 +474,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.sRGB) ?? platformColor
+            resolvedColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o)
             #else
             guard platformColor.getHue(&h, saturation: &s, brightness: &b, alpha: &o) else {
                 print("Update from Color Failed to extract HSB color components")
@@ -490,7 +496,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getRed(&r, green: &g, blue: &b, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.sRGB) ?? platformColor
+            resolvedColor.getRed(&r, green: &g, blue: &b, alpha: &o)
             #else
             guard platformColor.getRed(&r, green: &g, blue: &b, alpha: &o) else {
                 print("Update from Color Failed to extract RGB color components")
@@ -522,7 +529,8 @@ public struct ColorToken: Identifiable, Codable, Equatable, Hashable {
             var o: CGFloat = 0
 
             #if os(macOS)
-            platformColor.getWhite(&w, alpha: &o)
+            let resolvedColor = platformColor.usingColorSpace(.genericGamma22Gray) ?? platformColor
+            resolvedColor.getWhite(&w, alpha: &o)
             #else
             guard platformColor.getWhite(&w, alpha: &o) else {
                 print("Update from Color Failed to extract Gray color components")
