@@ -18,11 +18,11 @@ struct HexInputTip: Tip {
     var title: Text {
         Text("Hex Color Input")
     }
-    
+
     var message: Text? {
         Text("Enter hex code with/out the #. Supports (2) Gray, (3) RGB, (4) Gray/Alpha, (6) RRGGBB, (8) RRGGBBAA formats!!")
     }
-    
+
     var image: Image? {
         Image(systemName: "number.circle")
     }
@@ -52,14 +52,16 @@ public struct SingleColorPicker: View {
 
     let withAlpha: Bool
     private let lastFormulation: Binding<ColorToken.ColorFormulation>?
+    private let showColorSpacePicker: Binding<Bool>?
 
     @Environment(\.colorScheme) var colorScheme
 
     // MARK: - Initialization
-    public init(_ color: Binding<ColorToken>, withAlpha: Bool, lastFormulation: Binding<ColorToken.ColorFormulation>? = nil) {
+    public init(_ color: Binding<ColorToken>, withAlpha: Bool, lastFormulation: Binding<ColorToken.ColorFormulation>? = nil, showColorSpacePicker: Binding<Bool>? = nil) {
         self._color = color
         self.withAlpha = withAlpha
         self.lastFormulation = lastFormulation
+        self.showColorSpacePicker = showColorSpacePicker
     }
 
     // MARK: - Calculated Variables
@@ -89,7 +91,7 @@ public struct SingleColorPicker: View {
         if color.alpha < 0.42 {
             return colorScheme == .dark ? Color.white : Color.black
         }
-        
+
         // Because Color Formulations are now Synced just check Luminance
         let luminance = (0.299 * color.red) + (0.587 * color.green) + (0.114 * color.blue)
         return luminance < 0.5 ? Color.white : Color.black
@@ -198,7 +200,7 @@ public struct SingleColorPicker: View {
     private var hexInputSection: some View {
         VStack(spacing: 4) {
             hexInputField
-            
+
             if showError, let error = hexError {
                 VStack(spacing: 2) {
                     Text(error.errorDescription ?? "Invalid hex")
@@ -250,7 +252,9 @@ public struct SingleColorPicker: View {
     private var currentColorPicker: some View {
         ZStack {
             VStack {
-                rgbColorSpacePicker
+                if showColorSpacePicker?.wrappedValue == true {
+                    rgbColorSpacePicker
+                }
                 Spacer()
                 RGBColorPicker(self.selectedColor)
             }
@@ -266,7 +270,9 @@ public struct SingleColorPicker: View {
                 .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .cmyk)
 
             VStack {
-                rgbColorSpacePicker
+                if showColorSpacePicker?.wrappedValue == true {
+                    rgbColorSpacePicker
+                }
                 GrayScaleSlider(self.selectedColor)
                     .frame(height: 68)
             }
@@ -468,7 +474,7 @@ public struct SingleColorPicker: View {
         mainContentView
         #endif
     }
-    
+
     // MARK: - Helper Methods
     private func validateAndApplyHex() {
         let validationResult = HexValidator.validate(hexText.wrappedValue)
