@@ -76,13 +76,13 @@ public struct SingleColorPicker: View {
     private var frameHeight: CGFloat {
         switch self.selectedColor.wrappedValue.colorFormulation {
         case .rgb:
-            220
+            showColorSpacePicker?.wrappedValue == true ? 220: 169
         case .hsb:
             420
         case .cmyk:
             220
         case .gray:
-            120
+            showColorSpacePicker?.wrappedValue == true ? 111 : 80
         }
     }
 
@@ -249,13 +249,14 @@ public struct SingleColorPicker: View {
         }
     }
 
+    // MARK: - Current Color Picker
     private var currentColorPicker: some View {
         ZStack {
             VStack {
                 if showColorSpacePicker?.wrappedValue == true {
                     rgbColorSpacePicker
+                    Spacer()
                 }
-                Spacer()
                 RGBColorPicker(self.selectedColor)
             }
             .opacity(selectedColor.colorFormulation.wrappedValue == .rgb ? 1 : 0)
@@ -519,10 +520,13 @@ struct SingleColorPicker_Previews: PreviewProvider {
 
     private struct ViewWithState : View {
 
-        @State var color: ColorToken = .init(colorSpace: .sRGB, white: 0.26)
+        @State var color: ColorToken = .init(colorSpace: .displayP3, r: 0.33, g: 0.66, b: 0.99, a: 1) // RGB
+//        @State var color: ColorToken = .init(hue: 0.88, saturation: 0.69, brightness: 0.69, opacity: 1) // HSB
+//        @State var color: ColorToken = .init(cyan: 0.42, magenta: 1, yellow: 0, keyBlack: 0.42) // CMYK
+//        @State var color: ColorToken = .init(colorSpace: .sRGB, white: 0.26) // Gray
 
         var body: some View {
-            SingleColorPicker($color, withAlpha: true)
+            SingleColorPicker($color, withAlpha: true, showColorSpacePicker: .constant(false))
         }
     }
 }
