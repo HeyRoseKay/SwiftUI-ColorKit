@@ -74,7 +74,7 @@ public struct SaturationBrightnessStyle: TrackPadStyle {
     public func makeTrack(configuration: TrackPadConfiguration) -> some View {
         let brightnessGradient = LinearGradient(gradient: Gradient(colors: [Color(red: 1, green: 1, blue: 1), Color(red: 0, green: 0, blue: 0)]), startPoint: .top, endPoint: .bottom)
         let saturationGradient = LinearGradient(gradient: Gradient(colors: saturationColors), startPoint: .leading, endPoint: .trailing)
-        if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
+        if #available(iOS 15.0, macOS 12.0, *) {
             return ZStack {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(brightnessGradient)

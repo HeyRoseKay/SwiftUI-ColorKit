@@ -7,32 +7,6 @@
 // 
 
 import SwiftUI
-#if os(iOS)
-import TipKit
-#endif
-
-// MARK: - Hex Input Tip
-#if os(iOS)
-@available(iOS 17.0, *)
-struct HexInputTip: Tip {
-    var title: Text {
-        Text("Hex Color Input")
-    }
-
-    var message: Text? {
-        Text("Enter hex code with/out the #. Supports (2) Gray, (3) RGB, (4) Gray/Alpha, (6) RRGGBB, (8) RRGGBBAA formats!!")
-    }
-
-    var image: Image? {
-        Image(systemName: "number.circle")
-    }
-
-    @available(iOS 18.0, *)
-    var options: [any Option] {
-        [MaxDisplayDuration(150.0)]
-    }
-}
-#endif
 
 // MARK: - Single Color Picker View
 @available(iOS 13.0, macOS 11.0, *)
@@ -41,6 +15,7 @@ public struct SingleColorPicker: View {
     @State private var isShowingRadialHSB: Bool = false
     @State private var hexError: HexValidationError?
     @State private var showError: Bool = false
+    @State private var showHexFormatInfo: Bool = false
     @State private var privateText: String = ""
     private var hexText: Binding<String> {
         Binding {
@@ -73,16 +48,27 @@ public struct SingleColorPicker: View {
         }
     }
 
-    private var frameHeight: CGFloat {
+    /// The height a formulation's controls want when there is room to spare.
+    private var idealPickerHeight: CGFloat {
         switch self.selectedColor.wrappedValue.colorFormulation {
         case .rgb:
-            showColorSpacePicker?.wrappedValue == true ? 220: 169
+            showColorSpacePicker?.wrappedValue == true ? 208: 160
         case .hsb:
-            420
+            345
         case .cmyk:
-            220
+            212
         case .gray:
-            showColorSpacePicker?.wrappedValue == true ? 111 : 80
+            showColorSpacePicker?.wrappedValue == true ? 112 : 80
+        }
+    }
+
+    /// The smallest height a formulation's controls stay usable at. Only HSB can shrink, because its track pad is the one control that scales; the rest  fixed stacks of sliders and so are already at their minimum.
+    private var minimumPickerHeight: CGFloat {
+        switch self.selectedColor.wrappedValue.colorFormulation {
+        case .hsb:
+            200
+        default:
+            idealPickerHeight
         }
     }
 
@@ -140,8 +126,6 @@ public struct SingleColorPicker: View {
                                 lineWidth: 2.1
                             )
                     })
-                    .frame(maxWidth: 112)
-                    .padding(.top, 8)
                     .submitLabel(.done)
                     .onChange(of: hexText.wrappedValue) {
                         showError = false
@@ -162,8 +146,6 @@ public struct SingleColorPicker: View {
                                 lineWidth: 2.4
                             )
                     })
-                    .frame(maxWidth: 112)
-                    .padding(.top, 8)
                     .submitLabel(.done)
                     .onChange(of: hexText.wrappedValue) {
                         showError = false
@@ -185,21 +167,77 @@ public struct SingleColorPicker: View {
                                 lineWidth: 2.4
                             )
                     })
-                    .frame(maxWidth: 112)
-                    .padding(.top, 8)
                     .submitLabel(.done)
                     .onSubmit {
                         validateAndApplyHex()
                     }
             }
         }
+        .padding(.horizontal, 6)
     }
 
 
+    /// Description of every hex length the validator accepts, shown from the info button.
+    @available(iOS 15.0, macOS 13.0, *)
+    private var hexFormatInfoContent: some View {
+        let content = VStack(alignment: .leading, spacing: 8) {
+            Label("Hex Color Input", systemImage: "number.circle")
+                .font(.headline)
+
+            Group {
+                Text("Enter a hex code with").offset(y: 3)
+                Text("or without the #.").offset(y: -3)
+            }
+            .font(.subheadline)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("2 digits — Gray")
+                Text("3 digits — RGB")
+                Text("4 digits — Gray + Alpha")
+                Text("6 digits — RRGGBB")
+                Text("8 digits — RRGGBBAA")
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: 260, alignment: .leading)
+
+        return Group {
+            // Keeps the popover a popover on iPhone instead of adapting into a sheet.
+            if #available(iOS 16.4, macOS 13.3, *) {
+                content.presentationCompactAdaptation(.popover)
+            } else {
+                content
+            }
+        }
+    }
+
+    @available(iOS 15.0, macOS 13.0, *)
+    private var hexFormatInfoButton: some View {
+        Button {
+            showHexFormatInfo = true
+        } label: {
+            Image(systemName: "info.circle")
+                .imageScale(.large)
+                .foregroundColor(.secondary)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Hex format help")
+        .popover(isPresented: $showHexFormatInfo, arrowEdge: .top) {
+            hexFormatInfoContent
+        }
+        .padding(.trailing, 6)
+    }
+
     @available(iOS 15.0, macOS 13.0, *)
     private var hexInputSection: some View {
-        VStack(spacing: 4) {
-            hexInputField
+        VStack(spacing: 2) {
+            HStack(spacing: 4) {
+                hexInputField
+
+                hexFormatInfoButton
+            }
 
             if showError, let error = hexError {
                 VStack(spacing: 2) {
@@ -245,7 +283,6 @@ public struct SingleColorPicker: View {
                     .allowsHitTesting(isShowingRadialHSB)
                 #endif
             }
-            .animation(.smooth, value: isShowingRadialHSB)
         }
     }
 
@@ -280,60 +317,9 @@ public struct SingleColorPicker: View {
             .opacity(selectedColor.colorFormulation.wrappedValue == .gray ? 1 : 0)
             .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .gray)
         }
-        .animation(.easeInOut, value: selectedColor.colorFormulation.wrappedValue)
-        .frame(height: frameHeight)
     }
 
     // MARK: - Text Overlays
-    @available(iOS 15.0, macOS 13.0, *)
-    private var fullPlusHexColorOverlay: some View {
-        ZStack {
-            VStack {
-                ZStack {
-                    if self.selectedColor.colorFormulation.wrappedValue == .rgb {
-                        VStack {
-                            Text("Red: \(String(format: "%.0f", color.red*255))")
-                            Text("Green: \(String(format: "%.0f", color.green*255))")
-                            Text("Blue: \(String(format: "%.0f", color.blue*255))")
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                        }.foregroundColor(textColor)
-                    } else if self.selectedColor.colorFormulation.wrappedValue == .hsb {
-                        VStack {
-                            Text("Hue: \(String(format: "%.0f", color.hue*360))")
-                            Text("Saturation: \(String(format: "%.0f", color.saturation*100))%")
-                            Text("Brightness: \(String(format: "%.0f", color.brightness*100))%")
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                        }.foregroundColor(textColor)
-                    } else if self.selectedColor.colorFormulation.wrappedValue == .cmyk {
-                        VStack {
-                            Text("Cyan: \(String(format: "%.0f", color.cyan*100))%")
-                            Text("Magenta: \(String(format: "%.0f", color.magenta*100))%")
-                            Text("Yellow: \(String(format: "%.0f", color.yellow*100))%")
-                            Text("Black: \(String(format: "%.0f", color.keyBlack*100))%")
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                        }.foregroundColor(textColor)
-                    } else if self.selectedColor.colorFormulation.wrappedValue == .gray {
-                        VStack {
-                            Text("White: \(String(format: "%.0f", color.white*100))%")
-                            Text(String(color.color.toHex(for: color.rgbColorSpace.space)))
-                            Text("Alpha: \(String(format: "%.0f", color.alpha*100))%")
-                        }.foregroundColor(textColor)
-                    }
-
-                    #if os(iOS)
-                    if #available(iOS 17.0, *) {
-                        TipView(HexInputTip(), arrowEdge: .bottom)
-                            .tipImageSize(CGSizeMake(36, 36))
-                            .padding(.horizontal)
-                    }
-                    #endif
-                }
-
-                hexInputSection
-            }
-        }
-    }
-
     private var fullColorOverlay: some View {
         ZStack {
             if self.selectedColor.colorFormulation.wrappedValue == .rgb {
@@ -386,54 +372,166 @@ public struct SingleColorPicker: View {
          }
     }
 
+    /// Read-out drawn on top of the swatch, degrading from every component down to just the hex string, and to nothing at all when even that cannot fit.
     private var colorDescriptionOverlay: some View {
         Group {
             if #available(iOS 16.0, macOS 13.0, *) {
                 ViewThatFits(in: .vertical) {
-                    fullPlusHexColorOverlay
-
                     fullColorOverlay
 
                     basicColorOverlay
 
-                    Text("")
+                    EmptyView()
                 }
             } else {
                 fullColorOverlay
             }
         }
+        .padding(.horizontal, 8)
+        .clipped()
     }
 
-    // MARK: - Main Content View
-    private var mainContentView: some View {
-        VStack(spacing: 20) {
+    // MARK: - Swatch
+    private var colorSwatch: some View {
+        Group {
             if #available(iOS 26.0, macOS 26.0, *) {
                 RoundedRectangle(cornerRadius: 30)
                     .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 2)
                     .fill(self.selectedColor.wrappedValue.color)
-                    .overlay(colorDescriptionOverlay)
             } else if #available(iOS 17.0, macOS 14.0, *) {
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 2)
                     .fill(self.selectedColor.wrappedValue.color)
-                    .overlay(colorDescriptionOverlay)
             } else {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(self.selectedColor.wrappedValue.color)
-                    .overlay(colorDescriptionOverlay)
             }
+        }
+        // A floor for the overflow case: without it the swatch is the view that absorbs leftover space, so a formulation taller than its container would squeeze it away.
+        .frame(minHeight: 124)
+        .overlay(colorDescriptionOverlay)
+    }
+
+    /// Hex entry sits above the swatch rather than inside its overlay, so it is always present no matter which formulation is showing or how large the text is, and so the keyboard cannot cover it while the layout is pinned by `ignoresSafeArea(.keyboard)`.
+    @ViewBuilder
+    private var hexInputRow: some View {
+        if #available(iOS 15.0, macOS 13.0, *) {
+            hexInputSection
+        }
+    }
+
+    private var swatchGroup: some View {
+        VStack(spacing: 18) {
+            hexInputRow
+
+            colorSwatch
+        }
+    }
+
+    // MARK: - Layouts
+    /// Stacked layout, used whenever the container is taller than it is wide.
+    private var verticalContent: some View {
+        VStack(spacing: 16) {
+            swatchGroup
 
             formulationPicker
 
-            if withAlpha {
-                currentColorPicker
+            currentColorPicker
+                .frame(height: idealPickerHeight)
 
+            if withAlpha {
                 AlphaSlider(self.selectedColor)
                     .frame(height: 40)
-                    .padding(.bottom, 10)
-            } else {
+            }
+        }
+    }
+
+    /// Side by side layout for landscape, so the swatch stays on screen while the taller formulations use the full height of the container instead of scrolling out of view.
+    private var horizontalContent: some View {
+        HStack(alignment: .top, spacing: 42) {
+            swatchGroup
+                .frame(minWidth: 160, maxWidth: 300, maxHeight: .infinity)
+
+            VStack(spacing: 16) {
+                formulationPicker
+
                 currentColorPicker
-                    .padding(.bottom, 10)
+                    .frame(minHeight: minimumPickerHeight, maxHeight: idealPickerHeight)
+
+                if withAlpha {
+                    AlphaSlider(self.selectedColor)
+                        .frame(height: 40)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    /// The wide layout needs its horizontal inset back for the second column, and macOS wants more room above the swatch when the content is stacked.
+    private func contentInsets(isWide: Bool) -> EdgeInsets {
+        #if os(macOS)
+        return isWide
+            ? EdgeInsets(top: 16, leading: 24, bottom: 10, trailing: 24)
+            : EdgeInsets(top: 30, leading: 40, bottom: 10, trailing: 40)
+        #else
+        return isWide
+            ? EdgeInsets(top: 10, leading: 24, bottom: 10, trailing: 24)
+            : EdgeInsets(top: 10, leading: 40, bottom: 10, trailing: 40)
+        #endif
+    }
+
+    /// A ScrollView proposes an unbounded height, so any flexible subview inside it falls back to its ideal size: the swatch collapses to its minimum and the wide layout's picker snaps straight to its tallest height. Proposing the visible height instead lets both fill the viewport, while still letting the content grow past it, and so scroll, once the minimums no longer fit.
+    private func adaptiveContent(isWide: Bool, availableHeight: CGFloat) -> some View {
+        Group {
+            if isWide {
+                horizontalContent
+            } else {
+                verticalContent
+            }
+        }
+        .frame(idealHeight: availableHeight)
+    }
+
+    /// A single scroll view wrapping the whole picker, so oversized text or a formulation taller than its container can still be reached.
+    @ViewBuilder
+    private func scrollContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        if #available(iOS 16.4, macOS 13.3, *) {
+            ScrollView {
+                content()
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        } else {
+            ScrollView {
+                content()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func ignoringKeyboard<Content: View>(_ content: Content) -> some View {
+        #if os(iOS)
+        if #available(iOS 14.0, *) {
+            content.ignoresSafeArea(.keyboard)
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
+    }
+
+    // MARK: - View Body
+    public var body: some View {
+        GeometryReader { proxy in
+            let isWide = proxy.size.width > proxy.size.height
+            let insets = contentInsets(isWide: isWide)
+            let availableHeight = max(proxy.size.height - insets.top - insets.bottom, minimumPickerHeight)
+
+            scrollContainer {
+                ignoringKeyboard(
+                    adaptiveContent(isWide: isWide, availableHeight: availableHeight)
+                        .padding(insets)
+                )
             }
         }
         .onAppear {
@@ -441,39 +539,6 @@ public struct SingleColorPicker: View {
                 color.colorFormulation = lastFormulation.wrappedValue
             }
         }
-    }
-
-    // MARK: - View Body
-    public var body: some View {
-        #if os(iOS)
-        if #available(iOS 15.0, *) {
-            mainContentView
-                .padding(.horizontal, 40)
-                .padding(.vertical, 10)
-                .ignoresSafeArea(.keyboard)
-                .task {
-                    if #available(iOS 17.0, *) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4.2) {
-                            try? Tips.configure([
-                                .displayFrequency(.daily),
-                                .datastoreLocation(.applicationDefault)
-                            ])
-                        }
-                    }
-                }
-        } else {
-            mainContentView
-                .padding(.horizontal, 40)
-                .padding(.vertical, 10)
-        }
-        #elseif os(macOS)
-        mainContentView
-            .padding(.horizontal, 40)
-            .padding(.bottom, 10)
-            .padding(.top, 30)
-        #else
-        mainContentView
-        #endif
     }
 
     // MARK: - Helper Methods
@@ -505,16 +570,30 @@ struct SingleColorPicker_Previews: PreviewProvider {
 
     #if os(iOS)
     static var previews: some View {
-        ViewWithState()
-            .previewDisplayName("Single Color Picker")
-            .preferredColorScheme(.dark)
+        Group {
+            ViewWithState()
+                .previewDisplayName("Single Color Picker")
+
+            if #available(iOS 15.0, *) {
+                ViewWithState()
+                    .previewInterfaceOrientation(.landscapeLeft)
+                    .previewDisplayName("Single Color Picker — Landscape")
+            }
+        }
+        .preferredColorScheme(.dark)
     }
     #elseif os(macOS)
     static var previews: some View {
-        ViewWithState()
-            .frame(height: 800)
-            .previewDisplayName("Single Color Picker")
-            .preferredColorScheme(.dark)
+        Group {
+            ViewWithState()
+                .frame(width: 400, height: 800)
+                .previewDisplayName("Single Color Picker")
+
+            ViewWithState()
+                .frame(width: 900, height: 480)
+                .previewDisplayName("Single Color Picker — Wide")
+        }
+        .preferredColorScheme(.dark)
     }
     #endif
 
@@ -526,7 +605,7 @@ struct SingleColorPicker_Previews: PreviewProvider {
 //        @State var color: ColorToken = .init(colorSpace: .sRGB, white: 0.26) // Gray
 
         var body: some View {
-            SingleColorPicker($color, withAlpha: true, showColorSpacePicker: .constant(false))
+            SingleColorPicker($color, withAlpha: true, showColorSpacePicker: .constant(true))
         }
     }
 }

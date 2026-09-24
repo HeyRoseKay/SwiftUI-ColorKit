@@ -122,7 +122,7 @@ public struct RadialHSBColorPicker: View {
 
     // MARK: - View Body
     public var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 16) {
             RadialPad(offset: Binding(get: {self.color.saturation}, set: {self.color = self.color.update(saturation: $0)}),
                       angle: Binding(
                         get: {
@@ -159,7 +159,7 @@ struct RadialHSBColorPicker_Previews: PreviewProvider {
 
         var body: some View {
             RadialHSBColorPicker($color)
-                .frame(height: 360)
+                .frame(height: 345)
                 .padding(.all, 40)
         }
     }

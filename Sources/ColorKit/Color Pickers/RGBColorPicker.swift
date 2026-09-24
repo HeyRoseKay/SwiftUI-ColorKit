@@ -114,7 +114,7 @@ public struct RGBColorPicker: View {
        }
     
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             makeSlider( .red)
             makeSlider(.green)
             makeSlider(.blue)

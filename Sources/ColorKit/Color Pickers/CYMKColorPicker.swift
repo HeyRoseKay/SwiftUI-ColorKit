@@ -121,7 +121,7 @@ public struct CMYKColorPicker: View {
 
     // MARK: - View Body
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             makeSlider( .cyan)
             makeSlider(.magenta)
             makeSlider(.yellow)

@@ -21,10 +21,10 @@ public struct AlphaSliderStyle: LSliderStyle {
 
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
         ZStack {
-            if #available(iOS 26.0, macOS 26.0, watchOS 26.0, *) {
+            if #available(iOS 26.0, macOS 26.0, *) {
                 Circle()
                     .glassEffect(.regular, in: .circle)
-            } else if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
+            } else if #available(iOS 15.0, macOS 12.0, *) {
                 Circle()
                     .fill(Material.ultraThin)
             } else {
@@ -48,30 +48,60 @@ public struct AlphaSliderStyle: LSliderStyle {
     
     public func makeTrack(configuration: LSliderConfiguration) -> some View {
         GeometryReader { proxy in
+            let trackWidth = proxy.size.width + self.sliderHeight
+
             ZStack {
-                VStack(spacing: 0) {
-                    ForEach(0..<max(Int(proxy.size.height / self.blockHeight), 2)) { (v: Int)  in
-                        HStack(spacing: 0) {
-                            ForEach(0..<max(Int((proxy.size.width + self.sliderHeight) / self.blockHeight), 2), id: \.self) { (h: Int) in
-                                Rectangle()
-                                    .fill( h % 2 == 0 ? v % 2 == 0 ? Color.black : Color.white : v % 2 == 0 ? Color.white : Color.black).frame(width: self.blockHeight, height: self.blockHeight).tag(h)
-                            }
-                        }
-                    }
-                }
+                Color.white
+                AlphaGridShape(blockSize: self.blockHeight)
+                    .fill(Color.black)
                 LinearGradient(gradient: self.gradient, startPoint: .leading, endPoint: .trailing)
             }
-            .drawingGroup()
+            .frame(width: trackWidth, height: proxy.size.height)
             .mask(Capsule().fill())
             .offset(x: -self.sliderHeight / 2)
             .overlay(
                 Capsule()
                     .stroke(colorScheme == .dark ? Color.dimColorDark : Color.dimColorLight, lineWidth: 1)
-                    .frame(width: proxy.size.width + self.sliderHeight)
+                    .frame(width: trackWidth)
                     .offset(x: -self.sliderHeight / 2)
                     .shadow(radius: 2)
             )
         }
+    }
+}
+
+// MARK: - Alpha Grid Shape
+
+/// The checkerboard drawn behind the alpha gradient to represent transparency.
+///
+/// Only the dark squares are described by the path, so the shape is meant to be filled with the  dark color and layered over the light one. Because a shape receives its rect in `path(in:)`,  the row and column counts stay out of SwiftUI's view identity, which a size dependent `ForEach` range cannot do safely.
+@available(iOS 13.0, macOS 11.0, *)
+public struct AlphaGridShape: Shape {
+    public var blockSize: CGFloat
+
+    public init(blockSize: CGFloat = 10) {
+        self.blockSize = blockSize
+    }
+
+    public func path(in rect: CGRect) -> Path {
+        var path = Path()
+        guard blockSize > 0, !rect.isEmpty else { return path }
+
+        let columns = Int((rect.width / blockSize).rounded(.up))
+        let rows = Int((rect.height / blockSize).rounded(.up))
+
+        for row in 0..<rows {
+            for column in 0..<columns where (row + column).isMultiple(of: 2) {
+                // Clip the trailing and bottom squares so the grid never draws past its rect.
+                let block = CGRect(x: rect.minX + CGFloat(column) * blockSize,
+                                   y: rect.minY + CGFloat(row) * blockSize,
+                                   width: blockSize,
+                                   height: blockSize)
+                path.addRect(block.intersection(rect))
+            }
+        }
+
+        return path
     }
 }
 

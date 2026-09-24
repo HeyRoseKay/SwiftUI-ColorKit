@@ -219,7 +219,7 @@ public struct LinearGradientPicker: View {
                                                     endPoint: self.currentUnitEnd(proxy)))
             
             .drawingGroup(opaque: false, colorMode: self.manager.gradient.renderMode.renderingMode)
-            .animation(.interactiveSpring())
+            .transaction { $0.animation = .interactiveSpring() }
     }
     /// Creates a the views to be used as either the startHandle or endHandle
     private func makeHandle(_ proxy: GeometryProxy, _ point: Binding<UnitPoint>, _ state: GestureState<DragState>) -> some View {

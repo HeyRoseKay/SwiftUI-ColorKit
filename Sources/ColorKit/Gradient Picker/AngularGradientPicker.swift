@@ -217,7 +217,7 @@ public struct AngularGradientPicker: View {
                                                      startAngle: Angle(radians: self.currentStates.start*2 * .pi),
                                                      endAngle: Angle(radians: self.currentStates.end*2 * .pi)))
             .drawingGroup(opaque: false, colorMode: self.manager.gradient.renderMode.renderingMode)
-            .animation(.linear)
+            .transaction { $0.animation = .linear }
     }
     // Created the center thumb
     private func center(_ proxy: GeometryProxy) -> some View {
@@ -249,7 +249,7 @@ public struct AngularGradientPicker: View {
                     self.manager.gradient.startAngle = calculateDirection(self.currentCenter(proxy), $0.location)
                     self.startState = 0
                 }))
-            .animation(.none)
+            .transaction { $0.animation = nil }
     }
     private var endConfiguration: GradientHandleConfiguration {
         .init(endState != 0, endState != 0, manager.hideTools, Angle(radians: (currentStates.end) * 2 * .pi + .pi/2  ))
@@ -268,7 +268,7 @@ public struct AngularGradientPicker: View {
                     self.manager.gradient.endAngle = calculateDirection(self.currentCenter(proxy), $0.location)
                     self.endState = 0
                 }))
-            .animation(.none)
+            .transaction { $0.animation = nil }
     }
     // Creates all stop thumbs
     private func stops(_ proxy: GeometryProxy) -> some View {

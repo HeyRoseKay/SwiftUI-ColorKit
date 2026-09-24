@@ -23,17 +23,18 @@ public struct GrayScaleSliderStyle: LSliderStyle {
     }
 
     public func makeThumb(configuration: LSliderConfiguration) -> some View {
-        let strokeColor = Color(white: color.white < 0.75 ? 1 : 1 - color.white)
+        let strokeColor: Color
+        if #available(iOS 15.0, macOS 12.0, *) {
+            strokeColor = colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight
+        } else {
+            strokeColor = Color(white: color.white < 0.75 ? 1 : 1 - color.white)
+        }
+
         return ZStack {
             Pentagon()
                 .fill(Color(self.color.rgbColorSpace.space, white: color.white, opacity: 1))
-            if #available(iOS 15.0, macOS 12.0, watchOS 10.0, *) {
-                Pentagon()
-                    .stroke(colorScheme == .dark ? Color.prominentColorDark : Color.prominentColorLight, style: .init(lineWidth: 2, lineJoin: .round))
-            } else {
-                Pentagon()
-                    .stroke(strokeColor, style: .init(lineWidth: 2, lineJoin: .round))
-            }
+            Pentagon()
+                .stroke(strokeColor, style: .init(lineWidth: 2, lineJoin: .round))
         }
         .frame(width: sliderHeight / 2, height: 0.66 * sliderHeight)
         .offset(x: 0, y: 0.16 * sliderHeight - 1.5)

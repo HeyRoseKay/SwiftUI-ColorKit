@@ -184,7 +184,7 @@ public struct RadialGradientPicker: View {
                                                     startRadius: self.manager.gradient.startRadius + CGFloat(self.startState),
                                                     endRadius: self.manager.gradient.endRadius + CGFloat(self.endState)))
             .drawingGroup(opaque: false, colorMode: self.manager.gradient.renderMode.renderingMode)
-            .animation(.linear)
+            .transaction { $0.animation = .linear }
     }
     // Creates the center thumb representing the center of the gradient
     private func makeCenter(_ proxy: GeometryProxy) -> some View {
@@ -209,7 +209,7 @@ public struct RadialGradientPicker: View {
                 }).onEnded({
                     self.manager.gradient.endRadius = CGFloat(sqrt(($0.location - self.currentCenter(proxy)).magnitudeSquared))
                     self.endState = 0
-                })).animation(.linear)
+                })).transaction { $0.animation = .linear }
             .position(self.currentCenter(proxy))
     }
     // The Gradient filled bar that acts as a slider for the gradient stops

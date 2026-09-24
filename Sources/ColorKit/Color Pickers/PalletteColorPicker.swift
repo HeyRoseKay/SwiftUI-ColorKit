@@ -143,7 +143,6 @@ public struct PalletteColorPicker: View {
             .opacity(selectedColor.colorFormulation.wrappedValue == .gray ? 1 : 0)
             .allowsHitTesting(selectedColor.colorFormulation.wrappedValue == .gray)
         }
-        .animation(.easeInOut, value: selectedColor.colorFormulation.wrappedValue)
         .frame(height: frameHeight)
     }
 

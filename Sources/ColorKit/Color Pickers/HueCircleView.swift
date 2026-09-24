@@ -82,7 +82,6 @@ class SharedMetalResources {
 public class MetalView: NSObject, MTKViewDelegate {
     var queue: MTLCommandQueue!
     var vertexBuffer: MTLBuffer!
-    var uniformBuffer: MTLBuffer!
     var vertexData: [Vertex] = []
     
     private let sharedResources = SharedMetalResources.shared
@@ -163,16 +162,23 @@ public class MetalView: NSObject, MTKViewDelegate {
             length: MemoryLayout<Vertex>.size * vertexData.count,
             options: []
         )
-        
-        uniformBuffer = device.makeBuffer(
-            length: MemoryLayout<Float>.size * 16,
-            options: []
-        )
-        
-        let bufferPointer = uniformBuffer.contents()
-        memcpy(bufferPointer, Matrix().scalingMatrix(Matrix(), 0.5).m, MemoryLayout<Float>.size * 16)
     }
-    
+
+    /// Scales the hue disc so its rim inscribes the drawable's shorter axis, which is exactly where `.mask(Circle())` cuts. Vertices sit at model radius 2 and NDC spans -1...1 per axis, so a per-axis scale of `diameter / (2 * axisLength)` puts the rim on the mask edge. Reduces to the original 0.5 when the drawable is square.
+    private func uniformMatrix(forDrawableSize size: CGSize) -> Matrix {
+        let width = Float(max(size.width, 1))
+        let height = Float(max(size.height, 1))
+        let diameter = min(width, height)
+        // Slight overscan so the 1°-per-chord polygon can't leave a hairline gap at the rim;
+        // the Circle mask trims the excess.
+        let overscan: Float = 1.002
+        return Matrix().scalingMatrix(
+            Matrix(),
+            xScale: overscan * diameter / (2 * width),
+            yScale: overscan * diameter / (2 * height)
+        )
+    }
+
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
     
     public func draw(in view: MTKView) {
@@ -183,10 +189,10 @@ public class MetalView: NSObject, MTKViewDelegate {
             return
         }
         
-        rpd.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+        let uniforms = uniformMatrix(forDrawableSize: view.drawableSize)
         commandEncoder.setRenderPipelineState(sharedResources.renderPipelineState)
         commandEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-        commandEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
+        commandEncoder.setVertexBytes(uniforms.m, length: MemoryLayout<Float>.stride * 16, index: 1)
         commandEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: vertexData.count, instanceCount: 1)
         commandEncoder.endEncoding()
         commandBuffer.present(drawable)
@@ -226,6 +232,16 @@ struct Matrix {
         matrix.m[15] = 1.0
         return matrix
     }
+
+    /// A scale matrix with independent x and y scales, for fitting the disc into a non-square drawable without distorting it into an ellipse.
+    func scalingMatrix(_ matrix: Matrix, xScale: Float, yScale: Float) -> Matrix {
+        var matrix = matrix
+        matrix.m[0] = xScale
+        matrix.m[5] = yScale
+        matrix.m[10] = 1.0
+        matrix.m[15] = 1.0
+        return matrix
+    }
 }
 
 // MARK: - Hue Circle Metal View
@@ -246,6 +262,7 @@ struct HueCircleMetalView: UIViewRepresentable {
         view.framebufferOnly = false
         view.backgroundColor = .clear
         view.layer.isOpaque = false
+        view.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
         return view
     }
 
@@ -268,12 +285,10 @@ struct HueCircleMetalView: UIViewRepresentable {
 @available(iOS 13.0, *)
 struct HueCircleView: View {
     var body: some View {
-        ZStack {
-            GeometryReader { proxy in
-                HueCircleMetalView()
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .mask(Circle())
-            }
+        GeometryReader { proxy in
+            HueCircleMetalView()
+                .frame(width: proxy.size.width, height: proxy.size.height)
+                .mask(Circle())
         }
     }
 }
@@ -285,6 +300,26 @@ struct HueCircleView_Previews: PreviewProvider {
             .frame(width: 300, height: 300)
             .rotationEffect(Angle(degrees: -90))
             .preferredColorScheme(.dark)
+    }
+}
+
+/// In every frame the wheel should be a true circle inscribed in the shorter axis, fully  saturated where it meets the border.
+struct HueCircleViewAspectRatio_Previews: PreviewProvider {
+    static var previews: some View {
+        HStack(spacing: 20) {
+            HueCircleView()
+                .frame(width: 340, height: 190)
+                .border(.primary.opacity(0.5))
+            HueCircleView()
+                .frame(width: 190, height: 340)
+                .border(.primary.opacity(0.5))
+            HueCircleView()
+                .frame(width: 84, height: 340)
+                .border(.primary.opacity(0.5))
+        }
+        .padding()
+        .previewLayout(.sizeThatFits)
+        .preferredColorScheme(.dark)
     }
 }
 #endif
