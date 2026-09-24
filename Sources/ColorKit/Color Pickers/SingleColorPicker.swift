@@ -98,15 +98,19 @@ public struct SingleColorPicker: View {
             ForEach(ColorToken.ColorFormulation.allCases) { (formulation)  in
                 Text(formulation.rawValue).tag(formulation)
             }
-        }.pickerStyle(SegmentedPickerStyle())
+        }
+        .pickerStyle(SegmentedPickerStyle())
+        .labelsHidden()
     }
 
     private var rgbColorSpacePicker: some View {
-        Picker(selection: self.selectedColor.rgbColorSpace, label: Text("")) {
+        Picker(selection: self.selectedColor.rgbColorSpace, label: Text("Color Space")) {
             ForEach(ColorToken.RGBColorSpace.allCases) { space in
                 Text(space.rawValue).tag(space)
             }
-        }.pickerStyle(SegmentedPickerStyle())
+        }
+        .pickerStyle(SegmentedPickerStyle())
+        .labelsHidden()
     }
 
     @available(iOS 15.0, macOS 13.0, *)
@@ -471,12 +475,12 @@ public struct SingleColorPicker: View {
     private func contentInsets(isWide: Bool) -> EdgeInsets {
         #if os(macOS)
         return isWide
-            ? EdgeInsets(top: 16, leading: 24, bottom: 10, trailing: 24)
-            : EdgeInsets(top: 30, leading: 40, bottom: 10, trailing: 40)
+            ? EdgeInsets(top: 24, leading: 24, bottom: 24, trailing: 42)
+            : EdgeInsets(top: 24, leading: 36, bottom: 12, trailing: 36)
         #else
         return isWide
-            ? EdgeInsets(top: 10, leading: 24, bottom: 10, trailing: 24)
-            : EdgeInsets(top: 10, leading: 40, bottom: 10, trailing: 40)
+            ? EdgeInsets(top: 10, leading: 24, bottom: 10, trailing: 42)
+            : EdgeInsets(top: 10, leading: 36, bottom: 10, trailing: 36)
         #endif
     }
 
