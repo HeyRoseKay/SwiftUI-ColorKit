@@ -262,6 +262,7 @@ struct HueCircleMetalView: UIViewRepresentable {
         view.framebufferOnly = false
         view.backgroundColor = .clear
         view.layer.isOpaque = false
+        view.isUserInteractionEnabled = false
         view.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
         return view
     }
@@ -289,6 +290,7 @@ struct HueCircleView: View {
             HueCircleMetalView()
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .mask(Circle())
+                .allowsHitTesting(false)
         }
     }
 }
